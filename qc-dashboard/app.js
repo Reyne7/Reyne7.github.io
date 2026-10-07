@@ -383,10 +383,10 @@
   let detail = null;
   const PAGE_SIZE = 15;
 
-  function openReviewer(id) {
+  function openReviewer(id, back) {
     const s = reviewerStats.find((x) => x.r.id === id);
     if (!s) return;
-    detail = { s, filter: 'all', page: 0, lastFocus: document.activeElement };
+    detail = { s, filter: 'all', page: 0, lastFocus: document.activeElement, back };
     $('#rv-detail-title').textContent = `${s.r.id} ${s.r.name}`;
     $('#rv-detail-sub').textContent = `${s.r.group} · 审核 ${s.all.n} 件 · 被质检 ${s.all.sampled} 件 · 差错率 ${pct(s.all.errorRate)} · 主要差错类型：${s.mainType || '无'}`;
     $('#rv-detail-flag').innerHTML = s.flagged
@@ -428,6 +428,8 @@
         delete charts[k];
       }
     });
+    // 从 AI 辅助质检页跳转过来的，关闭后回到原页面
+    if (detail && detail.back) showView(detail.back);
     if (detail && detail.lastFocus) detail.lastFocus.focus();
     detail = null;
   }
@@ -573,8 +575,9 @@
   document.addEventListener('click', (e) => {
     const el = e.target.closest('[data-open-reviewer]');
     if (!el) return;
-    if (el.closest('#ov-alert')) showView('reviewers');
-    openReviewer(el.dataset.openReviewer);
+    const from = current;
+    if (!el.closest('#view-reviewers')) showView('reviewers');
+    openReviewer(el.dataset.openReviewer, from === 'ai' ? 'ai' : null);
   });
 
   // ================= 3. 宣导效果追踪 =================
@@ -674,11 +677,155 @@
     });
   }
 
+  // ================= 4. AI 辅助质检 =================
+  // 标注由大模型预先生成并保存在 ai-review.json，页面只读取展示，不在前端调用任何大模型接口
+  const caseById = Object.fromEntries(D.cases.map((c) => [c.id, c]));
+  const reviewerById = Object.fromEntries(D.reviewers.map((r) => [r.id, r]));
+  let aiData = null;
+  let aiFilter = 'all';
+
+  function loadAI() {
+    if (aiData) return Promise.resolve(aiData);
+    return fetch('ai-review.json').then((res) => {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json().then((j) => (aiData = j));
+    });
+  }
+
+  function highlightText(text, highlights, rejected) {
+    let html = esc(text);
+    highlights.forEach((h) => {
+      const e = esc(h);
+      html = html.split(e).join(`<mark class="hl${rejected ? ' rejected' : ''}">${e}</mark>`);
+    });
+    return html;
+  }
+
+  function aiItems() {
+    return aiData.notes.map((n) => {
+      const c = caseById[n.caseId];
+      const flagged = n.ai.verdict !== '无问题';
+      return { n, c, rv: reviewerById[c.reviewer], insp: inspectorById[c.inspector], flagged, confirmed: n.qc.result === '确认', rejected: flagged && n.qc.result === '驳回' };
+    });
+  }
+
+  function renderAINote(it, index) {
+    const { n, c, rv, insp, flagged, rejected } = it;
+    const anomaly = flaggedReviewers.some((s) => s.r.id === c.reviewer) && c.monthEnd;
+    const verdictTag = flagged
+      ? rejected
+        ? `<span class="tag outline">AI 标记：${n.ai.verdict}</span>`
+        : `<span class="tag accent">AI 标记：${n.ai.verdict}</span>`
+      : '<span class="tag brand">AI 判断：无问题</span>';
+    const qcTag = rejected ? '<span class="tag outline">✕ 质检员驳回</span>' : '<span class="tag brand">✓ 质检员确认</span>';
+    const qcName = insp ? insp.name : '质检员';
+    const prec = n.precedent
+      ? `<p class="pt">${esc(n.precedent.title)}</p><p>${esc(n.precedent.rule)}</p>`
+      : '<p class="none">无需推荐（备注已符合要求）</p>';
+    return `<article class="card note-card" data-flagged="${flagged}">
+      <div class="note-head">
+        <div class="note-meta">
+          <span class="nid">备注 ${String(index + 1).padStart(2, '0')}</span>
+          <button type="button" class="link-btn" data-open-reviewer="${rv.id}" title="查看${esc(rv.name)}的画像">${rv.id} ${esc(rv.name)} ›</button>
+          <span>${c.date}${c.monthEnd ? ' · 月末' : ''}</span>
+          <span>${c.tier}</span>
+          <span>模型建议${c.modelAdvice} → 审核${c.decision}</span>
+          <span>${c.id}</span>
+        </div>
+        ${anomaly ? '<span class="tag accent-outline">月末异常审核员</span>' : ''}
+      </div>
+      <blockquote class="note-text">${highlightText(n.text, n.highlights || [], rejected)}</blockquote>
+      <div class="note-grid">
+        <div class="note-col">
+          <h4>AI 判断</h4>
+          ${verdictTag}
+          ${flagged ? `<p>建议归入：<b>${n.ai.errorType}</b></p>` : ''}
+          <p>${esc(n.ai.reason)}</p>
+        </div>
+        <div class="note-col">
+          <h4>推荐判例</h4>
+          ${prec}
+        </div>
+        <div class="note-col">
+          <h4>质检员最终结论</h4>
+          ${qcTag}
+          <p>${esc(qcName)}：${esc(n.qc.comment)}</p>
+        </div>
+      </div>
+    </article>`;
+  }
+
+  function renderAI() {
+    const items = aiItems();
+    const est = aiData.meta.estimate;
+    const flaggedItems = items.filter((x) => x.flagged);
+    const confirmedItems = flaggedItems.filter((x) => x.confirmed);
+    const saved = est.manualSecPerNote - est.withAiSecPerNote;
+
+    // 异常审核员（月末）的备注：是否全部因“理由不充分”被标出
+    const anomIds = new Set(flaggedReviewers.map((s) => s.r.id));
+    const anom = items.filter((x) => anomIds.has(x.c.reviewer) && x.c.monthEnd);
+    const anomHit = anom.filter((x) => x.n.ai.verdict === '理由不充分');
+    let headline = `AI 标出的 <em>${flaggedItems.length}</em> 条疑似问题中，质检员确认 <em>${confirmedItems.length}</em> 条`;
+    if (anom.length) {
+      const who = [...anomIds].filter((id) => anom.some((x) => x.c.reviewer === id)).join('、');
+      headline += `；<span class="hot">${who}</span> 月末 ${anom.length} 条备注${anomHit.length === anom.length ? '全部' : `中 ${anomHit.length} 条`}因理由不充分被标出`;
+    }
+
+    const counts = { all: items.length, flagged: flaggedItems.length, clean: items.length - flaggedItems.length };
+    $('#ai-body').innerHTML = `
+      <div class="headline">
+        <div class="eyebrow">AI 辅助质检 · ${items.length} 条模拟审核备注的演示样本</div>
+        <h1>${headline}</h1>
+      </div>
+      <div class="ai-kpis">
+        <div class="kpi"><div class="label">AI 标记数</div><div class="value">${flaggedItems.length}<small>/ ${items.length} 条</small></div><div class="foot">占演示备注 ${pct(flaggedItems.length / items.length, 0)}</div></div>
+        <div class="kpi"><div class="label">质检员确认率</div><div class="value">${pct(confirmedItems.length / flaggedItems.length, 0)}</div><div class="foot">${confirmedItems.length}/${flaggedItems.length} 条被确认，${flaggedItems.length - confirmedItems.length} 条被驳回</div></div>
+        <div class="kpi"><div class="label">每条节省阅读时间<span class="tag est">估算</span></div><div class="value">约 ${saved}<small>秒</small></div><div class="foot">${esc(est.note)}</div></div>
+      </div>
+      <div class="ai-filter">
+        <h2>逐条备注</h2>
+        <div class="seg" id="ai-filter" role="group" aria-label="筛选备注">
+          <button type="button" data-filter="all">全部 ${counts.all}</button>
+          <button type="button" data-filter="flagged">AI 标记 ${counts.flagged}</button>
+          <button type="button" data-filter="clean">无问题 ${counts.clean}</button>
+        </div>
+      </div>
+      <div id="ai-list"></div>`;
+    $('#ai-filter').addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      aiFilter = b.dataset.filter;
+      renderAIList();
+    });
+    renderAIList();
+  }
+
+  function renderAIList() {
+    const items = aiItems();
+    document.querySelectorAll('#ai-filter button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === aiFilter)));
+    $('#ai-list').innerHTML = items
+      .map((it, i) => ({ it, i }))
+      .filter(({ it }) => aiFilter === 'all' || (aiFilter === 'flagged' ? it.flagged : !it.flagged))
+      .map(({ it, i }) => renderAINote(it, i))
+      .join('');
+  }
+
+  function renderAIPage() {
+    loadAI()
+      .then(renderAI)
+      .catch(() => {
+        $('#ai-body').innerHTML =
+          '<div class="card"><h3>无法读取标注数据（ai-review.json）</h3><p class="desc">请通过 http 地址访问本页面（GitHub Pages 或本地运行 <code>python3 -m http.server</code>），直接双击打开 HTML 文件时浏览器会禁止读取本地 JSON。</p></div>';
+      });
+  }
+
   // ================= 页面切换 =================
   const VIEWS = {
     overview: { rendered: false, charts: renderOverviewCharts },
     reviewers: { rendered: false, charts: renderQCChart },
     campaign: { rendered: false, charts: renderCampaignChart },
+    ai: { rendered: false, charts: renderAIPage },
   };
   let current = null;
 

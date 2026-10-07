@@ -299,11 +299,55 @@ td.wrap { white-space: normal; min-width: 180px; }
 .about li b { color: var(--text); }
 footer.foot { color: var(--muted); font-size: 12px; text-align: center; padding: 20px 16px 32px; }
 
+/* ---------- AI 辅助质检 ---------- */
+.ai-note {
+  display: flex; align-items: center; gap: 10px; margin-top: 20px; padding: 10px 14px; border-radius: 8px;
+  background: var(--brand-soft); color: var(--brand); font-size: 13px; font-weight: 500;
+}
+.ai-badge {
+  flex: none; background: var(--brand); color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+  padding: 1px 7px; border-radius: 4px;
+}
+:root[data-theme="dark"] .ai-badge { color: #0f1318; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ai-badge { color: #0f1318; } }
+.link-btn { appearance: none; border: 0; background: none; color: var(--brand); font: inherit; cursor: pointer; padding: 0; }
+.link-btn:hover { text-decoration: underline; }
+.note-meta .link-btn { background: var(--brand-soft); padding: 1px 9px; border-radius: 10px; font-size: 12.5px; font-weight: 600; }
+.note-meta .link-btn:hover { text-decoration: none; filter: brightness(0.96); }
+.ai-kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin-bottom: 8px; }
+.ai-kpis .kpi .label { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.tag.est { background: var(--surface-2); color: var(--muted); font-weight: 400; font-size: 11.5px; padding: 0 7px; }
+.ai-filter { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 28px 0 0; }
+.ai-filter h2 { font-size: 15px; margin: 0; }
+
+.note-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px 16px; flex-wrap: wrap; margin-bottom: 12px; }
+.note-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; font-size: 12.5px; color: var(--muted); }
+.note-meta .nid { font-weight: 700; color: var(--text); letter-spacing: 0.3px; }
+.note-text {
+  margin: 0; padding: 14px 16px; background: var(--surface-2); border-radius: 8px;
+  font-size: 14.5px; line-height: 1.9; color: var(--text);
+}
+mark.hl {
+  background: var(--accent-soft); color: inherit; padding: 1px 2px; border-radius: 2px;
+  border-bottom: 2px solid var(--accent);
+}
+mark.hl.rejected { background: transparent; border-bottom: 2px dotted var(--muted); }
+.note-grid { display: grid; grid-template-columns: 1.35fr 1.2fr 1fr; gap: 24px; margin-top: 16px; }
+.note-col { min-width: 0; font-size: 13px; color: var(--text-2); }
+.note-col h4 { margin: 0 0 8px; font-size: 12px; font-weight: 500; color: var(--muted); letter-spacing: 0.5px; }
+.note-col p { margin: 6px 0 0; }
+.note-col b { color: var(--text); }
+.note-col .pt { color: var(--text); font-weight: 600; margin: 0; }
+.note-col .none { color: var(--muted); }
+.tag.outline { color: var(--text-2); box-shadow: inset 0 0 0 1px var(--muted); }
+.retract { margin-top: 8px; padding: 10px 12px; border-radius: 6px; background: var(--surface-2); color: var(--text-2); }
+
 /* ---------- 响应式 ---------- */
 @media (max-width: 960px) {
   .kpi-layout { grid-template-columns: minmax(0, 1fr); }
   .grid.half { grid-template-columns: minmax(0, 1fr); }
   .mini-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .note-grid { grid-template-columns: minmax(0, 1fr); gap: 18px; }
 }
 @media (max-width: 600px) {
   .topbar-inner { padding: 12px 16px 4px; }
@@ -341,6 +385,13 @@ footer.foot { color: var(--muted); font-size: 12px; text-align: center; padding:
   .rv-table .chev { display: none; }
   .rv-table .tag { padding: 1px 6px; font-size: 11.5px; }
   .m-br { display: inline; }
+  .tab { margin: 0 2px; padding: 10px 6px 12px; }
+  .ai-note { align-items: flex-start; margin-top: 16px; }
+  .ai-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .ai-kpis .kpi .foot { display: none; }
+  .ai-kpis .kpi:nth-child(3) { grid-column: 1 / -1; }
+  .ai-kpis .kpi:nth-child(3) .foot { display: block; }
+  .note-text { padding: 12px 14px; font-size: 14px; }
   .rv-table th.nowrap { white-space: nowrap; }
   .hide-m { display: none; }
   #cp-table { font-size: 12.5px; }

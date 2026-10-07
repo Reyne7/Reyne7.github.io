@@ -14,7 +14,7 @@
         <span class="logo" aria-hidden="true">QC</span>
         <div>
           <div class="brand-name">贷前人工审核质检看板</div>
-          <div class="brand-sub">一致性看板 · 闭环追踪</div>
+          <div class="brand-sub">一致性看板 · 闭环追踪 · AI 辅助质检</div>
         </div>
       </div>
       <a class="back" href="../">← 返回作品集</a>
@@ -24,6 +24,7 @@
         <button class="tab" role="tab" id="tab-overview" aria-controls="view-overview" data-view="overview">团队总览</button>
         <button class="tab" role="tab" id="tab-reviewers" aria-controls="view-reviewers" data-view="reviewers">审核员画像</button>
         <button class="tab" role="tab" id="tab-campaign" aria-controls="view-campaign" data-view="campaign">宣导效果追踪</button>
+        <button class="tab" role="tab" id="tab-ai" aria-controls="view-ai" data-view="ai">AI 辅助质检</button>
       </div>
     </nav>
   </header>
@@ -62,12 +63,13 @@
 
       <section class="about" aria-labelledby="about-title">
         <h2 id="about-title">关于这个原型</h2>
-        <p>这是“贷前人工审核质检优化”解决方案中<b>一致性看板</b>与<b>闭环追踪</b>两个模块的演示原型，针对四个现状痛点：</p>
+        <p>这是“贷前人工审核质检优化”解决方案中<b>一致性看板</b>、<b>闭环追踪</b>与<b>AI 辅助质检</b>三个模块的演示原型，针对四个现状痛点，并演示大模型如何辅助质检：</p>
         <ol>
           <li><b>抽样只看件、不看人 → 加入审核员行为信号。</b>在静态分层抽样之外，持续计算每位审核员的通过率、与模型分歧率、审核时长及其月末偏移；出现异常时动态提高该审核员的抽检比例。</li>
           <li><b>质检尺度不一 → 一致性看板。</b>对比不同质检员对同类件的判定差错率，偏离过大时触发交叉复核与尺度校准会。</li>
           <li><b>反馈滞后、以分组宣导为主 → 差错归因分流。</b>政策理解偏差 → 培训宣导；执行不到位 → 流程与系统控制；为 KPI 动作变形 → 调整考核口径，而不是一味宣导。</li>
           <li><b>宣导后无人追踪 → 闭环追踪。</b>每次宣导登记主题与日期，自动跟踪同类差错在宣导前后的变化，用数据判断干预是否有效。</li>
+          <li><b>质检靠人工逐条阅读备注 → AI 辅助质检。</b>大模型读审核备注，标出“理由不充分、与政策口径冲突、关键核实缺失”的片段，建议归入差错类型并推荐相关判例；质检员仍做最终裁决，AI 误判也会被驳回并留痕。演示中的标注由大模型预先生成并保存为数据文件，前端不调用任何大模型接口，避免暴露密钥。</li>
         </ol>
         <p class="desc">本页面为纯前端原型，所有数据均为模拟生成，不代表任何真实机构。</p>
       </section>
@@ -131,6 +133,12 @@
           <div id="cp-record"></div>
         </div>
       </div>
+    </section>
+
+    <!-- ========== 4. AI 辅助质检 ========== -->
+    <section class="view" id="view-ai" role="tabpanel" aria-labelledby="tab-ai" hidden>
+      <div class="ai-note" role="note"><span class="ai-badge" aria-hidden="true">AI</span><span>以下标注由大模型预先生成，仅作演示；所有备注均为模拟数据，不代表任何真实机构</span></div>
+      <div id="ai-body"><p class="desc" style="margin-top:24px">加载中…</p></div>
     </section>
   </main>
 
