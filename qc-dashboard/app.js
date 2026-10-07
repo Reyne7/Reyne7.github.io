@@ -184,7 +184,7 @@
     const postRate = pooledRate(postWeeks);
 
     $('#ov-meta').textContent = `团队总览 · 本周 ${w.label}（${shortDate(w.start)}–${shortDate(w.end)}），环比对比 ${D.weeks[LAST - 2].label}`;
-    $('#ov-headline').innerHTML = `质检结果平均 <em>${cur.lag.toFixed(1)} 天</em>才反馈到审核员；宣导后差错率从 <em>${pct(preRate, 0)}</em> 降到 <em>${pct(postRate, 0)}</em>`;
+    $('#ov-headline').innerHTML = `现状：质检结果平均 <em>${cur.lag.toFixed(1)} 天</em>才反馈到审核员；宣导后差错率从 <em>${pct(preRate, 0)}</em> 降到 <em>${pct(postRate, 0)}</em>`;
 
     const lagD = cur.lag - prev.lag;
     const volD = cur.n - prev.n;
@@ -197,10 +197,10 @@
     ];
     $('#ov-kpis').innerHTML = `
       <div class="kpi main">
-        <div class="label">质检结果平均反馈时效</div>
+        <div class="label">质检结果平均反馈时效<span class="baseline-tag">现状基线</span></div>
         <div>
           <div class="value-row"><div class="value">${cur.lag.toFixed(1)}<small>天</small></div>${chg(`${arrow(lagD)} ${Math.abs(lagD).toFixed(1)} 天`, false)}</div>
-          <div class="foot">从审核完成到质检结果反馈给审核员 · 上周 ${prev.lag.toFixed(1)} 天</div>
+          <div class="foot">改进前：质检结果经汇总、分组宣导后才反馈到审核员；方案目标：当天推送</div>
         </div>
       </div>
       <div class="kpi-side">${side
