@@ -30,7 +30,7 @@
   </header>
 
   <div class="notice" role="note">
-    <div class="notice-inner"><span class="notice-icon" aria-hidden="true">i</span><span><strong>所有数据均为模拟生成，不代表任何真实机构。</strong><span class="notice-more">数据由固定随机种子在浏览器中生成，每次打开结果一致。</span></span></div>
+    <div class="notice-inner"><span class="notice-icon" aria-hidden="true">i</span><span data-notice="default"><strong>所有数据均为模拟生成，不代表任何真实机构。</strong><span class="notice-more">数据由固定随机种子在浏览器中生成，每次打开结果一致。</span></span><span data-notice="ai" hidden><strong>以下标注由大模型预先生成，仅作演示；所有备注均为模拟数据，不代表任何真实机构</strong></span></div>
   </div>
 
   <main>
@@ -69,7 +69,7 @@
           <li><b>质检尺度不一 → 一致性看板。</b>对比不同质检员对同类件的判定差错率，偏离过大时触发交叉复核与尺度校准会。</li>
           <li><b>反馈滞后、以分组宣导为主 → 差错归因分流。</b>政策理解偏差 → 培训宣导；执行不到位 → 流程与系统控制；为 KPI 动作变形 → 调整考核口径，而不是一味宣导。</li>
           <li><b>宣导后无人追踪 → 闭环追踪。</b>每次宣导登记主题与日期，自动跟踪同类差错在宣导前后的变化，用数据判断干预是否有效。</li>
-          <li><b>质检靠人工逐条阅读备注 → AI 辅助质检。</b>大模型读审核备注，标出“理由不充分、与政策口径冲突、关键核实缺失”的片段，建议归入差错类型并推荐相关判例；质检员仍做最终裁决，AI 误判也会被驳回并留痕。演示中的标注由大模型预先生成并保存为数据文件，前端不调用任何大模型接口，避免暴露密钥。</li>
+          <li><b>质检靠人工逐条阅读备注 → AI 辅助质检。</b>大模型读审核备注，标出“理由不充分、与政策口径冲突、关键核实缺失”的片段，建议归入差错类型并推荐相关判例；AI 不单凭一条备注判断动机：涉及“为 KPI 动作变形”的，需结合行为信号（时长、通过率、拒绝率等）和贷后表现，AI 只提供线索，质检员仍做最终裁决，AI 误判也会被驳回并留痕。演示中的标注由大模型预先生成并保存为数据文件，前端不调用任何大模型接口，避免暴露密钥。</li>
         </ol>
         <p class="desc">本页面为纯前端原型，所有数据均为模拟生成，不代表任何真实机构。</p>
       </section>
@@ -137,7 +137,6 @@
 
     <!-- ========== 4. AI 辅助质检 ========== -->
     <section class="view" id="view-ai" role="tabpanel" aria-labelledby="tab-ai" hidden>
-      <div class="ai-note" role="note"><span class="ai-badge" aria-hidden="true">AI</span><span>以下标注由大模型预先生成，仅作演示；所有备注均为模拟数据，不代表任何真实机构</span></div>
       <div id="ai-body"><p class="desc" style="margin-top:24px">加载中…</p></div>
     </section>
   </main>

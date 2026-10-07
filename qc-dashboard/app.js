@@ -714,11 +714,15 @@
     const anomaly = flaggedReviewers.some((s) => s.r.id === c.reviewer) && c.monthEnd;
     const verdictTag = flagged
       ? rejected
-        ? `<span class="tag outline">AI 标记：${n.ai.verdict}</span>`
-        : `<span class="tag accent">AI 标记：${n.ai.verdict}</span>`
+        ? `<span class="tag outline">AI 标记：${esc(n.ai.label || n.ai.verdict)}</span>`
+        : `<span class="tag accent">AI 标记：${esc(n.ai.label || n.ai.verdict)}</span>`
       : '<span class="tag brand">AI 判断：无问题</span>';
     const qcTag = rejected ? '<span class="tag outline">✕ 质检员驳回</span>' : '<span class="tag brand">✓ 质检员确认</span>';
     const qcName = insp ? insp.name : '质检员';
+    const sig = n.ai.signals || [];
+    const signals = sig.length
+      ? `<div class="signals"><div class="signals-label">关联信号<span>（备注以外的证据）</span></div><ul>${sig.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>`
+      : '';
     const prec = n.precedent
       ? `<p class="pt">${esc(n.precedent.title)}</p><p>${esc(n.precedent.rule)}</p>`
       : '<p class="none">无需推荐（备注已符合要求）</p>';
@@ -739,7 +743,8 @@
         <div class="note-col">
           <h4>AI 判断</h4>
           ${verdictTag}
-          ${flagged ? `<p>建议归入：<b>${n.ai.errorType}</b></p>` : ''}
+          ${flagged ? `<p>建议归入：<b>${esc(n.ai.errorType)}</b></p>` : ''}
+          ${signals}
           <p>${esc(n.ai.reason)}</p>
         </div>
         <div class="note-col">
@@ -779,10 +784,13 @@
         <h1>${headline}</h1>
       </div>
       <div class="ai-kpis">
-        <div class="kpi"><div class="label">AI 标记数</div><div class="value">${flaggedItems.length}<small>/ ${items.length} 条</small></div><div class="foot">占演示备注 ${pct(flaggedItems.length / items.length, 0)}</div></div>
+        <div class="kpi"><div class="label">AI 标记数</div><div class="value">${flaggedItems.length}<small>/ ${items.length} 条</small></div><div class="foot">演示样本按类型挑选，不代表真实比例</div></div>
         <div class="kpi"><div class="label">质检员确认率</div><div class="value">${pct(confirmedItems.length / flaggedItems.length, 0)}</div><div class="foot">${confirmedItems.length}/${flaggedItems.length} 条被确认，${flaggedItems.length - confirmedItems.length} 条被驳回</div></div>
         <div class="kpi"><div class="label">每条节省阅读时间<span class="tag est">估算</span></div><div class="value">约 ${saved}<small>秒</small></div><div class="foot">${esc(est.note)}</div></div>
       </div>
+      <aside class="ai-explain" aria-label="关于为 KPI 动作变形的说明">
+        <b>为 KPI 动作变形有两个方向：</b>为了考核加分放松标准，或为了控制名下不良率、体现风险识别而过度拒绝。判定需要结合备注、行为信号和贷后表现（如早期逾期），AI 只提供线索。
+      </aside>
       <div class="ai-filter">
         <h2>逐条备注</h2>
         <div class="seg" id="ai-filter" role="group" aria-label="筛选备注">
@@ -841,6 +849,10 @@
       VIEWS[name].charts();
       VIEWS[name].rendered = true;
     }
+    // 顶部数据声明：AI 页使用合并后的一条，其余页保持原样
+    document.querySelectorAll('[data-notice]').forEach((el) => {
+      el.hidden = el.dataset.notice !== (name === 'ai' ? 'ai' : 'default');
+    });
     if (location.hash !== '#' + name) history.replaceState(null, '', '#' + name);
     if (changed) window.scrollTo(0, 0);
   }
