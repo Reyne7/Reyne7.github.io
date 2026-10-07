@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>贷前人工审核质检看板</title>
+  <meta name="description" content="贷前人工审核质检看板可交互原型：一致性看板与宣导闭环追踪。所有数据均为模拟生成。">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="logo" aria-hidden="true">QC</span>
+        <div>
+          <div class="brand-name">贷前人工审核质检看板</div>
+          <div class="brand-sub">一致性看板 · 闭环追踪</div>
+        </div>
+      </div>
+      <a class="back" href="../">← 返回作品集</a>
+    </div>
+    <nav class="tabs" aria-label="页面切换">
+      <div class="tabs-inner" role="tablist">
+        <button class="tab" role="tab" id="tab-overview" aria-controls="view-overview" data-view="overview">团队总览</button>
+        <button class="tab" role="tab" id="tab-reviewers" aria-controls="view-reviewers" data-view="reviewers">审核员画像</button>
+        <button class="tab" role="tab" id="tab-campaign" aria-controls="view-campaign" data-view="campaign">宣导效果追踪</button>
+      </div>
+    </nav>
+  </header>
+
+  <div class="notice" role="note">
+    <div class="notice-inner"><span class="notice-icon" aria-hidden="true">i</span><span><strong>所有数据均为模拟生成，不代表任何真实机构。</strong><span class="notice-more">数据由固定随机种子在浏览器中生成，每次打开结果一致。</span></span></div>
+  </div>
+
+  <main>
+    <!-- ========== 1. 团队总览 ========== -->
+    <section class="view" id="view-overview" role="tabpanel" aria-labelledby="tab-overview">
+      <div class="headline">
+        <div class="eyebrow" id="ov-meta"></div>
+        <h1 id="ov-headline"></h1>
+      </div>
+
+      <div class="kpi-layout" id="ov-kpis"></div>
+
+      <div class="card" id="ov-alert"></div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h3>近 8 周差错率</h3>
+            <p class="desc">差错率 = 质检判定差错件数 ÷ 被质检件数</p>
+          </div>
+          <div class="legend" id="ov-trend-legend"></div>
+        </div>
+        <div class="chart-box"><canvas id="ov-trend" aria-label="8 周差错率趋势图"></canvas></div>
+        <details class="fold">
+          <summary><span class="fold-open">查看明细</span><span class="fold-close">收起明细</span></summary>
+          <p class="desc">质检覆盖率 = 被质检件数 ÷ 人工审核件数（现行静态分层抽样：高风险 30% / 渠道风险线索 20% / 低风险 10%）</p>
+          <div class="table-wrap"><table id="ov-week-table"></table></div>
+        </details>
+      </div>
+
+      <section class="about" aria-labelledby="about-title">
+        <h2 id="about-title">关于这个原型</h2>
+        <p>这是“贷前人工审核质检优化”解决方案中<b>一致性看板</b>与<b>闭环追踪</b>两个模块的演示原型，针对四个现状痛点：</p>
+        <ol>
+          <li><b>抽样只看件、不看人 → 加入审核员行为信号。</b>在静态分层抽样之外，持续计算每位审核员的通过率、与模型分歧率、审核时长及其月末偏移；出现异常时动态提高该审核员的抽检比例。</li>
+          <li><b>质检尺度不一 → 一致性看板。</b>对比不同质检员对同类件的判定差错率，偏离过大时触发交叉复核与尺度校准会。</li>
+          <li><b>反馈滞后、以分组宣导为主 → 差错归因分流。</b>政策理解偏差 → 培训宣导；执行不到位 → 流程与系统控制；为 KPI 动作变形 → 调整考核口径，而不是一味宣导。</li>
+          <li><b>宣导后无人追踪 → 闭环追踪。</b>每次宣导登记主题与日期，自动跟踪同类差错在宣导前后的变化，用数据判断干预是否有效。</li>
+        </ol>
+        <p class="desc">本页面为纯前端原型，所有数据均为模拟生成，不代表任何真实机构。</p>
+      </section>
+    </section>
+
+    <!-- ========== 2. 审核员画像 ========== -->
+    <section class="view" id="view-reviewers" role="tabpanel" aria-labelledby="tab-reviewers" hidden>
+      <div class="headline">
+        <div class="eyebrow">审核员画像 · 近 8 周全部人工审核件</div>
+        <h1 id="rv-headline"></h1>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h3>审核员行为指标</h3>
+            <p class="desc">按月末偏移从高到低排序，点击任一行查看详情。月末偏移 = 每月最后 5 天通过率 − 其余日期通过率；超过 15 pp 且同时出现分歧率上升（+8 pp 以上）或审核时长骤降（−25% 以上）时标记为“月末异常”。</p>
+          </div>
+        </div>
+        <div class="table-wrap"><table id="rv-table" class="rv-table"></table></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h3>质检员尺度对比</h3>
+            <p class="desc" id="qc-desc"></p>
+          </div>
+        </div>
+        <div class="chart-box short"><canvas id="qc-chart" aria-label="质检员判定差错率偏离团队均值"></canvas></div>
+        <div class="table-wrap"><table id="qc-table"></table></div>
+      </div>
+    </section>
+
+    <!-- ========== 3. 宣导效果追踪 ========== -->
+    <section class="view" id="view-campaign" role="tabpanel" aria-labelledby="tab-campaign" hidden>
+      <div class="headline">
+        <div class="eyebrow" id="cp-meta"></div>
+        <h1 id="cp-headline"></h1>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h3>三类差错 8 周发生率</h3>
+            <p class="desc">发生率 = 该类差错件数 ÷ 当周被质检件数</p>
+          </div>
+          <div class="legend" id="cp-legend"></div>
+        </div>
+        <div class="chart-box tall"><canvas id="cp-chart" aria-label="三类差错周发生率曲线"></canvas></div>
+      </div>
+
+      <div class="grid half">
+        <div class="card">
+          <h3>宣导前后对比</h3>
+          <p class="desc">宣导前 W1–W3，宣导后 W5–W8（W4 为过渡周不计入）；双比例 z 检验，α = 0.05</p>
+          <div class="table-wrap"><table id="cp-table"></table></div>
+        </div>
+        <div class="card">
+          <h3>宣导记录</h3>
+          <div id="cp-record"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">© Reyne · 作品集原型 · 模拟数据，仅供演示</footer>
+
+  <div class="overlay" id="rv-overlay" hidden>
+    <div class="drawer" role="dialog" aria-modal="true" aria-labelledby="rv-detail-title">
+      <div class="drawer-head">
+        <div>
+          <h3 id="rv-detail-title"></h3>
+          <div class="drawer-sub" id="rv-detail-sub"></div>
+        </div>
+        <span id="rv-detail-flag"></span>
+        <button type="button" class="close" id="rv-close">关闭</button>
+      </div>
+      <div class="drawer-body">
+        <div class="mini-kpis" id="rv-detail-kpis"></div>
+        <div class="grid half">
+          <div class="card">
+            <div class="card-head">
+              <h3>周趋势</h3>
+              <div class="legend" id="rv-week-legend"></div>
+            </div>
+            <div class="chart-box short"><canvas id="rv-week-chart" aria-label="审核员周趋势"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <h3>逐日通过率</h3>
+              <div class="legend" id="rv-day-legend"></div>
+            </div>
+            <div class="chart-box short"><canvas id="rv-day-chart" aria-label="审核员逐日通过率"></canvas></div>
+            <p class="desc">仅显示当日件量 ≥ 4 的日期</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h3>审核件列表</h3>
+              <p class="desc" id="rv-case-count"></p>
+            </div>
+            <div class="seg" id="rv-case-filter">
+              <button type="button" data-filter="all" aria-pressed="true">全部</button>
+              <button type="button" data-filter="monthEnd" aria-pressed="false">月末窗口</button>
+              <button type="button" data-filter="diverge" aria-pressed="false">与模型分歧</button>
+              <button type="button" data-filter="error" aria-pressed="false">质检差错</button>
+            </div>
+          </div>
+          <div class="table-wrap"><table id="rv-case-table"></table></div>
+          <div class="pager" id="rv-pager"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

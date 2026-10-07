@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reyne 作品集</title>
+  <meta name="description" content="Reyne 的个人作品集：AI 售前 / 金融风控解决方案。">
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f3f5f8;
+      --surface: #ffffff;
+      --border: #e1e5eb;
+      --text: #1d2129;
+      --text-2: #4e5969;
+      --muted: #7a8494;
+      --brand: #1a4f8b;
+      --brand-soft: #e8f0fa;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --bg: #121416; --surface: #1a1c1f; --border: #2f343b;
+        --text: #f2f3f5; --text-2: #c3c7ce; --muted: #8d95a1;
+        --brand: #6fa3e0; --brand-soft: #1d2a3b;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #121416; --surface: #1a1c1f; --border: #2f343b;
+      --text: #f2f3f5; --text-2: #c3c7ce; --muted: #8d95a1;
+      --brand: #6fa3e0; --brand-soft: #1d2a3b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", "Segoe UI", sans-serif;
+      line-height: 1.7;
+    }
+    .wrap { max-width: 880px; margin: 0 auto; padding: 56px 16px 40px; }
+    header h1 { font-size: 40px; margin: 0; letter-spacing: 1px; }
+    header .role { font-size: 18px; color: var(--brand); font-weight: 600; margin: 4px 0 10px; }
+    header p { color: var(--text-2); margin: 0; max-width: 640px; }
+    h2 { font-size: 15px; color: var(--muted); font-weight: 600; letter-spacing: 2px; margin: 48px 0 14px; }
+    .works { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+    .work {
+      display: block;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 18px 20px;
+      color: inherit;
+      text-decoration: none;
+      transition: border-color .15s, transform .15s;
+    }
+    .work:hover, .work:focus-visible { border-color: var(--brand); transform: translateY(-2px); outline: none; }
+    .work .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .work .tags span { font-size: 12px; color: var(--brand); background: var(--brand-soft); border-radius: 10px; padding: 1px 8px; }
+    .work h3 { margin: 0 0 6px; font-size: 17px; }
+    .work p { margin: 0; font-size: 14px; color: var(--text-2); }
+    .work .go { display: inline-block; margin-top: 12px; font-size: 14px; color: var(--brand); font-weight: 600; }
+    .work.placeholder { border-style: dashed; color: var(--muted); display: flex; align-items: center; justify-content: center; min-height: 140px; font-size: 14px; }
+    footer { color: var(--muted); font-size: 12px; margin-top: 56px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Reyne</h1>
+      <div class="role">求职方向：AI 售前 / 金融风控解决方案</div>
+      <p>关注银行信贷风控流程中的业务痛点，把问题拆解为可落地的解决方案，并用可交互原型把方案讲清楚。</p>
+    </header>
+
+    <h2>作品</h2>
+    <div class="works">
+      <a class="work" href="qc-dashboard/">
+        <div class="tags"><span>贷前审核</span><span>质检</span><span>可交互原型</span></div>
+        <h3>贷前人工审核质检看板</h3>
+        <p>针对静态抽样、质检尺度不一、宣导效果无人追踪等痛点，演示“一致性看板”与“闭环追踪”方案。数据为模拟生成。</p>
+        <span class="go">打开看板 →</span>
+      </a>
+      <div class="work placeholder">更多作品陆续添加中</div>
+    </div>
+
+    <footer>© Reyne · 页面中的所有案例数据均为模拟生成，不代表任何真实机构。</footer>
+  </div>
+</body>
+</html>
