@@ -16,6 +16,16 @@
   th { background: #f3f4f6; }
   blockquote { border-left: 3px solid #2563eb; margin: 12px 0; padding: 4px 14px; color: #374151; background: #f8fafc; }
   hr { border: none; border-top: 1px solid #e5e7eb; margin: 28px 0; }
+  .notice { background: #fef9c3; border: 1px solid #facc15; color: #713f12; border-radius: 6px; padding: 8px 14px; font-size: 14px; margin: 12px 0; }
+  .summary { border: 1px solid #d1d5db; border-radius: 8px; padding: 4px 18px 10px; background: #f8fafc; margin: 18px 0; }
+  .summary h2 { border: none; margin-top: 12px; }
+  .toc { font-size: 14px; line-height: 2; }
+  .toc a { color: #2563eb; text-decoration: none; margin-right: 14px; white-space: nowrap; }
+  .arch { margin: 12px 0; }
+  .arch .layer { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; border: 1px solid #d1d5db; border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; background: #f8fafc; }
+  .arch .layer b { flex: 0 0 100%; font-size: 13px; color: #2563eb; }
+  .arch .layer span { flex: 1 1 150px; background: #fff; border: 1px solid #e5e7eb; border-radius: 6px; padding: 4px 8px; font-size: 13px; line-height: 1.5; }
+  @media (prefers-color-scheme: dark) { .notice { background: #422006; border-color: #a16207; color: #fde68a; } .summary, .arch .layer { background: #1f2937; border-color: #374151; } .arch .layer span { background: #111827; border-color: #374151; } .toc a, .arch .layer b { color: #60a5fa; }}
   @media (prefers-color-scheme: dark) { body { background: #111827; color: #e5e7eb; } th { background: #1f2937; } th, td { border-color: #374151; } blockquote { background: #1f2937; color: #d1d5db; } h2, hr { border-color: #374151; } }
 </style>
 </head>
@@ -23,16 +33,28 @@
 <nav><a href="../">← 作品集首页</a><a href="../qc-dashboard/">作品一：贷前人工审核质检看板</a></nav>
 <h1>银行信用卡合规投诉智能质检解决方案</h1>
 <blockquote>
-<p>文档性质：售前方案作品（基于真实银行业务经验脱敏撰写）
+<p>文档性质：售前方案作品（作者独立撰写，内容与数据均为虚构示例）
 适用场景：银行信用卡中心 / 零售银行客户投诉处理与风险质检部门
-说明：文中机构名称已脱敏；业务量级、抽检比例、收益数据为方案测算示例参数（标注），实施时以客户实际数据校准。</p>
+说明：文中不涉及任何真实机构名称；业务量级、抽检比例、收益数据均为方案测算示例参数，实施时以客户实际数据校准。</p>
 </blockquote>
+<div class="notice"><strong>声明：</strong>本页为作者独立撰写的求职作品，不含任何原单位内部资料；未使用真实机构名称、制度原文或真实工单。文中所有业务量级、比例、耗时与收益数字均为<strong>虚构的示例参数</strong>，仅用于演示测算方法，不代表任何真实机构或实测结果。</div>
+<div class="summary">
+<h2>一页摘要</h2>
+<ul>
+<li><strong>痛点</strong>：投诉质检靠人工抽检（示例：约 5%），口径不一、分类靠经验、整改靠 Excel，合规问题发现滞后。</li>
+<li><strong>方案</strong>：机器做全量初筛与一致性判断，人工做高风险定性与最终裁量；规则类评分可复算，语义类评分必带证据。</li>
+<li><strong>四个能力</strong>：工单分类分级、智能质检引擎、RAG 知识库处置助手、风险预警。</li>
+<li><strong>验收</strong>：POC 4 周，示例门槛为分类准确率 ≥ 90%、高风险召回率 ≥ 95%、质检一致性 ≥ 85%，不达标不推广。</li>
+<li><strong>延伸</strong>：<a href="#appendix-b">客户常见疑问与答复（附录 B）</a></li>
+</ul>
+<div class="toc"><a href="#s1">1 背景</a><a href="#s2">2 现状流程</a><a href="#s3">3 总体设计</a><a href="#s4">4 功能模块</a><a href="#s5">5 技术与合规</a><a href="#s6">6 实施路径</a><a href="#s7">7 收益测算</a><a href="#s8">8 风险</a><a href="#appendix-a">附录</a></div>
+</div>
 <hr />
-<h2>1. 项目背景与挑战</h2>
+<h2 id="s1">1. 项目背景与挑战</h2>
 <h3>1.1 监管与业务背景</h3>
 <p>银行保险机构消费者权益保护监管持续趋严，投诉处理已从“服务问题”升级为“合规问题”：</p>
 <ul>
-<li><strong>时效硬约束</strong>：监管对投诉受理、处理、回复均有明确时限要求，逾期直接影响消保监管评价；</li>
+<li><strong>时效硬约束</strong>：监管对投诉受理、处理、回复有时限要求（具体时限以客户适用的监管与行内制度文件为准），逾期会影响消保监管评价；</li>
 <li><strong>征信类投诉敏感度极高</strong>：涉及个人征信异议的投诉处理差错，可能触发监管转办、行政处罚与声誉风险；</li>
 <li><strong>投诉量随业务量持续增长</strong>，但处理与质检人力无法同比扩张，人均负荷逐年上升；</li>
 <li><strong>监管检查口径</strong>：监管与行内审计不只看处理结果，还要看处理过程的合规证据（录音、话术、时效留痕），质检即是证据链的一环。</li>
@@ -51,7 +73,7 @@
 <tr>
 <td>1</td>
 <td>质检覆盖率低</td>
-<td>人工抽检只能覆盖约 3%–5% 的结案工单，九成以上处理过程无人复核</td>
+<td>人工抽检只能覆盖约 5%（示例）的结案工单，九成以上处理过程无人复核</td>
 <td>合规问题靠运气暴露，一次抽查发现往往意味着存量问题</td>
 </tr>
 <tr>
@@ -76,13 +98,13 @@
 </table>
 <h3>1.3 建设目标</h3>
 <ol>
-<li>质检覆盖率从人工抽样约 5% 提升至<strong>全量机器初筛 + 高风险人工复核</strong>；</li>
+<li>质检覆盖率从人工抽样约 5%（示例）提升至<strong>全量机器初筛 + 高风险人工复核</strong>；</li>
 <li>建立<strong>统一、可解释、可申诉</strong>的智能质检评分体系，评分点全部可溯源至法规与行内制度条款；</li>
 <li>投诉接入环节实现<strong>自动分类分级与风险预警</strong>，高风险案件分钟级识别；</li>
 <li>将历史复杂案件与法规制度沉淀为<strong>可检索的知识资产</strong>，缩短新人上手周期。</li>
 </ol>
 <hr />
-<h2>2. 现状流程分析（As-Is）</h2>
+<h2 id="s2">2. 现状流程分析（As-Is）</h2>
 <h3>2.1 投诉处理流程</h3>
 <table>
 <thead>
@@ -212,7 +234,7 @@
 </table>
 <p><strong>小结</strong>：现有流程的骨架是健康的，问题出在“人肉执行”——分类、查证、打分、跟踪四个环节都在消耗熟练人力做重复判断。这是典型的适合“机器做全量初筛与一致性判断、人工做高风险定性与最终裁量”的场景。</p>
 <hr />
-<h2>3. 解决方案总体设计</h2>
+<h2 id="s3">3. 解决方案总体设计</h2>
 <h3>3.1 设计原则</h3>
 <ol>
 <li><strong>人机协同，不做无人化承诺</strong>：机器负责全量初筛、分类、评分与预警；定性裁量、客户沟通、最终结案永远保留人工确认环节；</li>
@@ -221,14 +243,12 @@
 <li><strong>小步验证</strong>：先 POC 验证核心指标，再分场景推广，不接受“大干快上、一次上线全功能”。</li>
 </ol>
 <h3>3.2 总体架构</h3>
-<p><code>应用层   智能质检工作台 │ 处置辅助台（知识问答）│ 风险预警台 │ 管理驾驶舱
-─────────────────────────────────────────────────────────────
-能力层   工单分类分级 Agent │ 语义质检引擎 │ RAG 知识库 │ 预警规则引擎
-         （分类/分级/派单建议）（评分点逐项核验）（法规·制度·案例）（升级/群体/转办预警）
-─────────────────────────────────────────────────────────────
-数据层   工单数据 │ 通话录音（ASR 转写）│ 历史案件库 │ 法规制度库 │ 质检结果库
-─────────────────────────────────────────────────────────────
-基础层   私有化部署大模型 │ 向量数据库 │ 权限与审计 │ 数据脱敏组件</code></p>
+<div class="arch">
+<div class="layer"><b>应用层</b><span>智能质检工作台</span><span>处置辅助台（知识问答）</span><span>风险预警台</span><span>管理驾驶舱</span></div>
+<div class="layer"><b>能力层</b><span>工单分类分级 Agent<br>分类 / 分级 / 派单建议</span><span>语义质检引擎<br>评分点逐项核验</span><span>RAG 知识库<br>法规 · 制度 · 案例</span><span>预警规则引擎<br>升级 / 群体 / 转办</span></div>
+<div class="layer"><b>数据层</b><span>工单数据</span><span>通话录音（ASR 转写）</span><span>历史案件库</span><span>法规制度库</span><span>质检结果库</span></div>
+<div class="layer"><b>基础层</b><span>私有化部署大模型</span><span>向量数据库</span><span>权限与审计</span><span>数据脱敏组件</span></div>
+</div>
 <h3>3.3 目标流程（To-Be）</h3>
 <ol>
 <li><strong>接入即分类</strong>：工单登记后，分类分级 Agent 在分钟内完成类型判定、紧急分级、涉征信/涉监管风险标记，并给出派单建议；人工只做确认与例外调整；</li>
@@ -239,7 +259,7 @@
 <li><strong>风险前置预警</strong>：同类投诉短期激增、同一产品/渠道异常聚集、疑似升级监管的风险案件，由预警引擎实时推送至管理岗。</li>
 </ol>
 <hr />
-<h2>4. 核心功能模块</h2>
+<h2 id="s4">4. 核心功能模块</h2>
 <h3>4.1 工单智能分类分级</h3>
 <ul>
 <li>支持按行内现行分类体系（业务类型 × 诉求类型 × 风险等级）自动打标；</li>
@@ -307,7 +327,7 @@
 <h3>4.5 管理驾驶舱</h3>
 <p>质检覆盖率、问题类型分布、团队与个人质量趋势、整改完成率、投诉分类热力——全部由质检结果数据自动生成，替代人工 Excel 汇总；支持按机构、团队、产品、渠道下钻。</p>
 <hr />
-<h2>5. 关键技术与合规设计</h2>
+<h2 id="s5">5. 关键技术与合规设计</h2>
 <h3>5.1 防幻觉设计（金融场景红线）</h3>
 <ol>
 <li><strong>引用溯源强制开启</strong>：知识问答与质检判定中的每条法规类结论必须挂接原文出处，无出处不输出；</li>
@@ -317,7 +337,7 @@
 </ol>
 <h3>5.2 数据安全</h3>
 <ul>
-<li><strong>私有化部署</strong>：模型、向量库与业务数据全部部署在行内环境，数据不出域；</li>
+<li><strong>私有化部署</strong>：按客户安全要求，模型、向量库与业务数据部署在行内环境，数据不出域；</li>
 <li><strong>数据脱敏</strong>：进入模型处理前，客户姓名、证件号、卡号等敏感字段自动脱敏，处理后按权限还原；</li>
 <li><strong>权限分级</strong>：按岗位设定数据可见范围（如质检员仅可见本机构案件），与行内现有权限体系对齐；</li>
 <li><strong>全量审计日志</strong>：谁在什么时间查了什么、改了什么评分，完整留痕，满足内审与监管检查要求。</li>
@@ -360,7 +380,7 @@
 </tbody>
 </table>
 <hr />
-<h2>6. 实施路径</h2>
+<h2 id="s6">6. 实施路径</h2>
 <h3>6.1 POC 阶段（4 周）</h3>
 <table>
 <thead>
@@ -393,7 +413,7 @@
 </tr>
 </tbody>
 </table>
-<p><strong>POC 验收门槛（示例，签约前双方确认）</strong>：分类准确率 ≥ 90%；高风险案件召回率 ≥ 95%；质检一致性 ≥ 85%；任一核心指标不达标，POC 不进入付费推广阶段。</p>
+<p><strong>POC 验收门槛（均为示例数值，签约前须与客户共同确认）</strong>：分类准确率 ≥ 90%；高风险案件召回率 ≥ 95%；质检一致性 ≥ 85%；任一核心指标不达标，POC 不进入付费推广阶段。</p>
 <h3>6.2 试点与推广</h3>
 <ul>
 <li><strong>试点（2 个月）</strong>：1 个处理团队全量使用，系统与人工双轨运行，逐周复盘分歧案件、迭代评分点；</li>
@@ -407,9 +427,9 @@
 <li>上线后 1 个月驻场陪跑，分歧案件逐案复盘——售前承诺的验收指标，由交付团队以陪跑机制兜底。</li>
 </ul>
 <hr />
-<h2>7. 预期收益与 ROI 测算</h2>
+<h2 id="s7">7. 预期收益与 ROI 测算</h2>
 <blockquote>
-<p>以下为测算框架与示例参数（基于信用卡中心常见量级），实际数值须以客户真实工单量与人力成本校准。测算口径在 POC 阶段即与客户共同锁定，避免验收争议。</p>
+<p>以下为测算框架与<strong>虚构的示例参数</strong>，并非实测，实际数值须以客户真实工单量与人力成本校准。测算口径在 POC 阶段即与客户共同锁定，避免验收争议。</p>
 </blockquote>
 <table>
 <thead>
@@ -428,28 +448,28 @@
 <tr>
 <td>质检人力释放</td>
 <td>原质检人力 × 可自动化评分点占比</td>
-<td>释放约 40%–60% 重复打分工作量，转投复核与规则运营</td>
+<td>示例：释放约 40%–60% 重复打分工作量，转投复核与规则运营</td>
 </tr>
 <tr>
 <td>分类分级提效</td>
 <td>接入环节人工判断时间下降</td>
-<td>单件分类耗时由约 3 分钟降至秒级（人工仅确认）</td>
+<td>示例：单件分类耗时由约 3 分钟降至秒级（人工仅确认）</td>
 </tr>
 <tr>
 <td>处置周期缩短</td>
 <td>知识助手减少查法规、找案例时间</td>
-<td>复杂案件平均处置时长下降约 20%–30%</td>
+<td>示例：复杂案件平均处置时长下降约 20%–30%</td>
 </tr>
 <tr>
 <td>合规风险下降</td>
 <td>超时结案、告知缺失类问题前置拦截</td>
-<td>时效类问题趋近于零容忍可控</td>
+<td>时效类超时由规则引擎全量拦截，结果可复算</td>
 </tr>
 </tbody>
 </table>
 <p><strong>ROI 口径</strong>：年化收益 = 释放人力成本 + 处置提效折算 + 监管处罚与赔付风险敞口下降（定性评估）；投资回收期以 POC 实测参数代入后给出区间，不做点值承诺。</p>
 <hr />
-<h2>8. 风险与应对</h2>
+<h2 id="s8">8. 风险与应对</h2>
 <table>
 <thead>
 <tr>
@@ -487,7 +507,7 @@
 </tbody>
 </table>
 <hr />
-<h2>附录 A：质检评分点体系（示例节选）</h2>
+<h2 id="appendix-a">附录 A：质检评分点体系（示例节选）</h2>
 <table>
 <thead>
 <tr>
@@ -548,7 +568,7 @@
 </tr>
 </tbody>
 </table>
-<h2>附录 B：方案讲解答疑预案（节选）</h2>
+<h2 id="appendix-b">附录 B：方案讲解答疑预案（节选）</h2>
 <ul>
 <li><strong>“机器质检会不会乱扣分？”</strong>——规则类评分可复算、语义类评分给证据且可改判，影子运行两周达标才启用，全程留痕可申诉；</li>
 <li><strong>“数据能不能出域？”</strong>——不能，也不需要：全套私有化部署，数据不出客户环境；</li>
@@ -556,8 +576,8 @@
 <li><strong>“多久见效？”</strong>——POC 4 周出可验证结论，试点 2 个月见覆盖率与人力释放实测数据，不达标不推广。</li>
 </ul>
 <hr />
-<p><em>本方案为售前作品集文档：方案结构、评分点体系与实施路径基于作者在银行信用卡中心的投诉处理与风险质检实务经验设计；文中数据为脱敏后的测算示例。</em></p>
+<p><em>本方案为售前作品集文档：方案结构、评分点体系与实施路径由作者基于行业通用做法独立设计；文中数据均为虚构的测算示例。</em></p>
 <hr>
-<p style="font-size:13px;color:#6b7280">作品性质：售前方案作品，基于真实银行业务经验脱敏撰写；文中业务量级、抽检比例与收益数据为方案测算示例参数，实施时以客户实际数据校准。作者：Reyne（银行信用卡风控 4 年）· 求职方向：AI 售前 / 金融风控解决方案。</p>
+<p style="font-size:13px;color:#6b7280">作品性质：售前方案作品，文中业务量级、抽检比例与收益数据均为虚构的示例参数，实施时以客户实际数据校准。作者：Reyne（银行信用卡风控 4 年）· 求职方向：AI 售前 / 金融风控解决方案。</p>
 </body>
 </html>
