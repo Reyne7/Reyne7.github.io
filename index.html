@@ -1,95 +1,549 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Reyne 作品集</title>
-  <meta name="description" content="Reyne 的个人作品集：AI 售前 / 金融风控解决方案。">
-  <style>
-    :root {
-      color-scheme: light;
-      --bg: #f3f5f8;
-      --surface: #ffffff;
-      --border: #e1e5eb;
-      --text: #1d2129;
-      --text-2: #4e5969;
-      --muted: #7a8494;
-      --brand: #1a4f8b;
-      --brand-soft: #e8f0fa;
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reyne</title>
+<meta name="description" content="Reyne — 探索 AI 的边界，探索 AI 时代的财富自由之路。AI × 金融科技 · build in public。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@500&family=Noto+Sans+SC:wght@300;400;500&family=Inter:wght@400;500&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<script>
+  // 主题：手动选择优先，其次跟随系统
+  try { var t = localStorage.getItem('theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+  document.documentElement.classList.add('js');
+</script>
+<style>
+  :root{
+    --bg:#f1ede6; --ink:#161513; --muted:#6f6a62; --line:#d8d2c7;
+    --accent:#c8553d; --card:#f7f4ee; --body:#3b3833;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#151412; --ink:#efebe4; --muted:#9a948a; --line:#2e2b27;
+      --accent:#e07a5f; --card:#1c1b18; --body:#cfc9bf;
     }
-    @media (prefers-color-scheme: dark) {
-      :root:not([data-theme="light"]) {
-        color-scheme: dark;
-        --bg: #121416; --surface: #1a1c1f; --border: #2f343b;
-        --text: #f2f3f5; --text-2: #c3c7ce; --muted: #8d95a1;
-        --brand: #6fa3e0; --brand-soft: #1d2a3b;
-      }
-    }
-    :root[data-theme="dark"] {
-      color-scheme: dark;
-      --bg: #121416; --surface: #1a1c1f; --border: #2f343b;
-      --text: #f2f3f5; --text-2: #c3c7ce; --muted: #8d95a1;
-      --brand: #6fa3e0; --brand-soft: #1d2a3b;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", "Segoe UI", sans-serif;
-      line-height: 1.7;
-    }
-    .wrap { max-width: 880px; margin: 0 auto; padding: 56px 16px 40px; }
-    header h1 { font-size: 40px; margin: 0; letter-spacing: 1px; }
-    header .role { font-size: 18px; color: var(--brand); font-weight: 600; margin: 4px 0 10px; }
-    header p { color: var(--text-2); margin: 0; max-width: 640px; }
-    h2 { font-size: 15px; color: var(--muted); font-weight: 600; letter-spacing: 2px; margin: 48px 0 14px; }
-    .works { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
-    .work {
-      display: block;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 18px 20px;
-      color: inherit;
-      text-decoration: none;
-      transition: border-color .15s, transform .15s;
-    }
-    .work:hover, .work:focus-visible { border-color: var(--brand); transform: translateY(-2px); outline: none; }
-    .work .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
-    .work .tags span { font-size: 12px; color: var(--brand); background: var(--brand-soft); border-radius: 10px; padding: 1px 8px; }
-    .work h3 { margin: 0 0 6px; font-size: 17px; }
-    .work p { margin: 0; font-size: 14px; color: var(--text-2); }
-    .work .go { display: inline-block; margin-top: 12px; font-size: 14px; color: var(--brand); font-weight: 600; }
-    .work.placeholder { border-style: dashed; color: var(--muted); display: flex; align-items: center; justify-content: center; min-height: 140px; font-size: 14px; }
-    footer { color: var(--muted); font-size: 12px; margin-top: 56px; }
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <header>
-      <h1>Reyne</h1>
-      <div class="role">求职方向：AI 售前 / 金融风控解决方案</div>
-      <p>关注银行信贷风控流程中的业务痛点，把问题拆解为可落地的解决方案，并用可交互原型把方案讲清楚。</p>
-    </header>
+  }
+  :root[data-theme="dark"]{
+    --bg:#151412; --ink:#efebe4; --muted:#9a948a; --line:#2e2b27;
+    --accent:#e07a5f; --card:#1c1b18; --body:#cfc9bf;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:"Noto Sans SC","PingFang SC","Inter",system-ui,sans-serif;
+    font-weight:300; line-height:1.75; -webkit-font-smoothing:antialiased;
+    transition:background .3s,color .3s;
+  }
+  a{color:inherit;text-decoration:none}
+  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+  .serif{font-family:"Playfair Display","Noto Serif SC",Georgia,serif}
+  .inter{font-family:Inter,sans-serif}
+  .wrap{max-width:1136px;margin:0 auto;padding:0 28px;position:relative}
+  .wide{max-width:1356px;margin:0 auto;padding:0 28px;position:relative}
 
-    <h2>作品</h2>
-    <div class="works">
-      <a class="work" href="qc-dashboard/">
-        <div class="tags"><span>贷前审核</span><span>质检</span><span>AI 辅助质检</span><span>可交互原型</span></div>
-        <h3>贷前人工审核质检看板</h3>
-        <p>针对静态抽样、质检尺度不一、宣导效果无人追踪等痛点，演示“一致性看板”“闭环追踪”和“AI 辅助质检”方案。数据为模拟生成。</p>
-        <span class="go">打开看板 →</span>
-      </a>
-      <a class="work" href="solution/">
-        <div class="tags"><span>信用卡</span><span>合规投诉</span><span>智能质检</span><span>售前方案</span></div>
-        <h3>银行信用卡合规投诉智能质检解决方案</h3>
-        <p>从监管与业务痛点出发，给出分类分级、智能质检、知识库助手与风险预警的人机协同方案，含实施路径与 ROI 测算框架。文中数据为示例参数。</p>
-        <span class="go">阅读方案 →</span>
+  /* nav */
+  nav{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line);transition:background .3s}
+  nav .wide{display:flex;justify-content:space-between;align-items:center;height:64px}
+  nav .logo{font-family:"Playfair Display",serif;font-size:22px;font-weight:700}
+  nav ul{display:flex;gap:32px;align-items:center;list-style:none;font-family:Inter,"Noto Sans SC",sans-serif;font-size:13px;letter-spacing:.06em;color:var(--muted)}
+  nav ul a{transition:color .2s}
+  nav ul a:hover,nav ul a.on{color:var(--ink)}
+  .theme{width:34px;height:18px;border:1px solid var(--muted);border-radius:9px;position:relative}
+  .theme::after{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:var(--ink);transition:transform .3s}
+  .is-dark .theme::after{transform:translateX(16px)}
+  .progress{position:absolute;left:0;bottom:-1px;width:100%;height:6px;overflow:visible;clip-path:inset(0 calc(100% - var(--p,0%)) 0 0)}
+
+  /* hero */
+  .hero{position:relative;padding:56px 0 96px;overflow:hidden}
+  .hero::before,.hero::after{content:"";position:absolute;top:0;bottom:0;width:1px;background:var(--line)}
+  .hero::before{left:max(12px,calc(50% - 678px - 4px))}
+  .hero::after{left:max(18px,calc(50% - 678px + 2px))}
+  .name{position:relative}
+  .name svg{display:block;width:100%;height:auto;overflow:visible}
+  .name text{font-family:"Playfair Display",Georgia,serif;font-weight:500}
+  .draw{transform-box:fill-box;transform-origin:left center;animation:draw 1.8s cubic-bezier(.6,.1,.3,1) .2s both}
+  @keyframes draw{from{transform:scaleX(0)}}
+  .phase{position:absolute;font-size:12px;color:var(--muted);line-height:1;white-space:nowrap;background:var(--bg);padding:2px 4px;transition:background .3s}
+  .here{position:absolute;width:0;height:0}
+  .here i{position:absolute;left:-5px;top:-5px;width:10px;height:10px;border-radius:50%;background:var(--accent)}
+  .here i::after{content:"";position:absolute;inset:-7px;border:1px solid var(--accent);border-radius:50%;opacity:.4}
+  .here span{position:absolute;left:-.5px;top:16px;height:34px;border-left:1px solid var(--accent)}
+  .here b{position:absolute;left:8px;top:40px;font:500 12px Inter,"Noto Sans SC",sans-serif;letter-spacing:.06em;color:var(--accent);white-space:nowrap;background:var(--bg);padding:1px 4px;transition:background .3s}
+  .js .phase,.js .here{animation:fade .6s ease 1.6s both}
+  @keyframes fade{from{opacity:0}}
+
+  .hero-row{display:grid;grid-template-columns:1fr 360px;gap:80px;align-items:end;margin-top:28px}
+  .tag{display:flex;align-items:center;gap:10px;font-family:Inter,sans-serif;font-size:13px;letter-spacing:.04em;color:var(--accent)}
+  .tag::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--accent)}
+  .lines{margin-top:18px;font-size:clamp(20px,2.4vw,27px);line-height:1.6;font-weight:400}
+  .btns{display:flex;gap:16px;flex-wrap:wrap;margin-top:40px}
+  .btn{display:inline-flex;align-items:center;gap:16px;border:1px solid var(--ink);padding:14px 30px;font-size:14px;font-weight:400;transition:background .2s,color .2s}
+  .btn span{font-family:Inter,sans-serif;transition:transform .2s}
+  .btn:hover{background:var(--ink);color:var(--bg)}
+  .btn:hover span{transform:translateX(4px)}
+
+  .now{display:block;border-top:1px solid var(--ink);padding-top:16px}
+  .now .h{display:flex;justify-content:space-between;font:500 11px Inter,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+  .now .h b{color:var(--accent);font-weight:500;letter-spacing:.08em}
+  .now p{font-size:15.5px;line-height:1.75;margin:12px 0 14px;font-weight:400}
+  .now .f{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+  .now .f span:last-child{font-family:Inter,sans-serif;transition:transform .2s}
+  .now:hover .f span:last-child{transform:translateX(4px)}
+
+  /* sections */
+  section.block{border-top:1px solid var(--line);padding:120px 0}
+  .eyebrow{font-family:Inter,sans-serif;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:14px}
+  .eyebrow b{color:var(--accent);font-weight:500}
+  .eyebrow i{width:40px;height:1px;background:var(--line)}
+  h2{font-family:"Playfair Display","Noto Serif SC",Georgia,serif;font-size:clamp(40px,6.2vw,76px);font-weight:500;line-height:1.08;margin:18px 0 64px;letter-spacing:-.02em}
+  h2 em{font-family:"Playfair Display",serif;font-style:italic;color:var(--accent)}
+
+  /* about */
+  .about{display:grid;grid-template-columns:1fr 400px;gap:100px;align-items:start}
+  .about .lead{font-size:21px;line-height:1.8;font-weight:400}
+  .about p+p{margin-top:22px}
+  .about p{font-size:17px;line-height:1.95;color:var(--body)}
+  .about .lead{color:var(--ink)}
+  .sig{margin-top:40px;display:flex;align-items:baseline;gap:16px}
+  .sig span:first-child{font:600 40px "Caveat",cursive;transform:rotate(-4deg);display:inline-block}
+  .sig span:last-child{font-size:13px;color:var(--muted)}
+  .venn{display:block;width:220px;height:auto;margin:0 0 28px}
+  .facts{border-top:1px solid var(--ink)}
+  .facts div{display:flex;justify-content:space-between;gap:16px;padding:16px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+  .facts dt{color:var(--muted)}
+  .facts dd{text-align:right;font-weight:400}
+
+  /* work */
+  .work-head{display:flex;justify-content:space-between;align-items:flex-end;gap:32px;flex-wrap:wrap;margin-bottom:56px}
+  .work-head h2{margin-bottom:0}
+  .count{font-size:14px;color:var(--muted);margin-bottom:6px}
+  .count b{font:500 15px Inter,sans-serif;color:var(--ink)}
+  .filters{display:flex;gap:26px;flex-wrap:wrap;font-size:14px;color:var(--muted);margin-top:14px}
+  .filters button{position:relative;color:var(--muted);transition:color .2s;padding:2px 0}
+  .filters button sup{font:500 10px Inter,sans-serif;margin-left:3px}
+  .filters button:hover{color:var(--ink)}
+  .filters button[aria-pressed="true"]{color:var(--ink)}
+  .filters button[aria-pressed="true"]::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:1px;background:var(--accent)}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
+  .item{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:34px 36px 32px;display:flex;flex-direction:column;min-height:250px;transition:background .2s,opacity .16s}
+  a.item:hover{background:var(--card)}
+  .item[hidden]{display:none}
+  .meta{display:flex;justify-content:space-between;gap:12px;font-family:Inter,"Noto Sans SC",sans-serif;font-size:12px;letter-spacing:.08em;color:var(--muted)}
+  .meta .pill{color:var(--accent)}
+  .item h3{font-family:"Playfair Display","Noto Serif SC",Georgia,serif;font-size:24px;font-weight:500;margin:22px 0 10px;line-height:1.4}
+  .item p{font-size:14.5px;color:var(--muted);line-height:1.85;flex:1}
+  .go{margin-top:22px;font-size:14px;display:flex;align-items:center;gap:10px;font-weight:400}
+  .go span{font-family:Inter,sans-serif;transition:transform .2s}
+  a.item:hover .go span{transform:translateX(5px)}
+  .go.mute{color:var(--muted);font-weight:300}
+  .item.next{min-height:0;justify-content:center;color:var(--muted);font-size:14.5px}
+
+  .featured{grid-column:span 2;display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:56px;padding:44px}
+  .featured .txt{display:flex;flex-direction:column}
+  .featured h3{font-size:clamp(28px,3.4vw,40px);line-height:1.25;margin-top:26px}
+  .featured p{font-size:15.5px;flex:0}
+  .dash{border:1px solid var(--line);background:var(--card);font-family:Inter,"Noto Sans SC",sans-serif;align-self:start}
+  .dash .t{padding:16px 20px;border-bottom:1px solid var(--line);font-size:14px;font-weight:400;line-height:1.6}
+  .dash .t em{font-style:normal;color:var(--accent);font-weight:500}
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--line)}
+  .kpis div{padding:16px 20px;border-right:1px solid var(--line)}
+  .kpis div:last-child{border-right:0}
+  .kpis small{display:block;font-size:12px;color:var(--muted)}
+  .kpis strong{font:500 30px/1.25 "Playfair Display",serif;letter-spacing:-.01em}
+  .kpis strong span{font:400 13px "Noto Sans SC",sans-serif;margin-left:2px}
+  .trend{padding:14px 20px 8px}
+  .trend .h{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+  .trend svg{display:block;width:100%;height:auto;margin-top:6px;overflow:visible}
+  .trend text{font-family:Inter,sans-serif;font-size:10px;fill:var(--muted)}
+  .dash .cap{padding:10px 20px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted);display:flex;justify-content:space-between;gap:12px}
+
+  /* log */
+  .log{list-style:none;border-top:1px solid var(--ink)}
+  .log li{display:grid;grid-template-columns:120px 1fr 120px;gap:32px;padding:22px 0;border-bottom:1px solid var(--line);align-items:baseline}
+  .log time{font:500 13px Inter,sans-serif;letter-spacing:.06em;color:var(--muted)}
+  .log li:first-child time{color:var(--accent)}
+  .log p{font-size:16px;font-weight:400;line-height:1.7}
+  .log span{font-size:13px;color:var(--muted);text-align:right}
+
+  /* contact */
+  .hi{position:relative;margin:18px 0 40px}
+  .hi h2{font-family:"Playfair Display",Georgia,serif;font-size:clamp(96px,17vw,240px);line-height:1;letter-spacing:-.045em;margin:0 0 0 -.04em;position:relative;white-space:nowrap}
+  .hi .end{display:inline-block;width:0}
+  .hi svg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+  .contact .lead{font-size:19px;line-height:1.8;font-weight:400;max-width:520px}
+  .contact-row{display:grid;grid-template-columns:1fr 1.5fr;gap:90px;align-items:start}
+  .links{border-top:1px solid var(--ink)}
+  .links a,.links div{display:grid;grid-template-columns:1fr auto 32px;align-items:center;gap:20px;height:84px;padding:0 4px;border-bottom:1px solid var(--line);transition:background .2s,color .2s,padding .2s}
+  .links .p{font-family:"Playfair Display","Noto Serif SC",Georgia,serif;font-size:34px;font-weight:500}
+  .links small{font:400 14px Inter,sans-serif;color:var(--muted);transition:color .2s}
+  .links .a{font-family:Inter,sans-serif;font-size:20px;text-align:right;transition:transform .2s}
+  .links a:hover{background:var(--ink);color:var(--bg);padding:0 20px}
+  .links a:hover small{color:var(--line)}
+  .links a:hover .p{font-style:italic}
+  .links a:hover .a{transform:rotate(45deg);color:var(--accent)}
+  .links div .p,.links div small{color:var(--muted)}
+
+  footer{border-top:1px solid var(--line)}
+  footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px;height:96px;font-family:Inter,sans-serif;font-size:12px;color:var(--muted)}
+  .top{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line);padding:10px 18px;font-size:12px;color:var(--ink);transition:background .2s,color .2s,border-color .2s}
+  .top span{transition:transform .2s}
+  .top:hover{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+  .top:hover span{transform:translateY(-3px)}
+
+  /* 淡入 */
+  .js .reveal{opacity:0;transition:opacity .8s ease}
+  .js .reveal.in{opacity:1}
+
+  @media (max-width:900px){
+    .hero-row,.about,.contact-row{grid-template-columns:1fr;gap:48px}
+    .featured{grid-template-columns:1fr;gap:32px}
+  }
+  @media (max-width:760px){
+    .wrap,.wide{padding:0 16px}
+    nav ul{gap:16px}
+    .hero{padding:36px 0 72px}
+    .hero::before,.hero::after{display:none}
+    .phase{font-size:11px;padding:1px 2px}
+    .here b{display:none}
+    .here span{height:18px}
+    section.block{padding:80px 0}
+    h2{margin-bottom:44px}
+    .grid{grid-template-columns:1fr}
+    .featured{grid-column:span 1;padding:32px 20px}
+    .item{padding:28px 20px;min-height:0}
+    .kpis div{padding:12px}
+    .kpis strong{font-size:22px}
+    .log li{grid-template-columns:64px 1fr;gap:16px}
+    .log span{display:none}
+    .links a,.links div{height:68px}
+    .links .p{font-size:26px}
+    .links a:hover{padding:0 12px}
+  }
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto}
+    *,*::before,*::after{animation:none!important;transition:none!important}
+    .js .reveal{opacity:1}
+  }
+</style>
+</head>
+<body id="top">
+
+<nav>
+  <div class="wide">
+    <a href="#top" class="logo">Reyne</a>
+    <ul>
+      <li><a href="#about">About</a></li>
+      <li><a href="#work">作品</a></li>
+      <li><a href="#log">日志</a></li>
+      <li><a href="#contact">联系</a></li>
+      <li><button class="theme" id="theme" aria-label="切换浅色 / 深色"></button></li>
+    </ul>
+  </div>
+  <!-- 阅读进度：首屏周期线的细微呼应 -->
+  <svg class="progress" viewBox="0 0 1000 6" preserveAspectRatio="none" aria-hidden="true"><path d="M0 3 Q 31 0 62 3 T 125 3 T 187 3 T 250 3 T 312 3 T 375 3 T 437 3 T 500 3 T 562 3 T 625 3 T 687 3 T 750 3 T 812 3 T 875 3 T 937 3 T 1000 3" fill="none" stroke="var(--accent)" stroke-width="1.4" vector-effect="non-scaling-stroke"/></svg>
+</nav>
+
+<header class="hero">
+  <div class="wide">
+    <h1 class="name" aria-label="Reyne">
+      <!-- 名字用 textLength 撑满容器宽度；周期线在字母内的部分用底色“切开” -->
+      <svg viewBox="0 0 1000 390" aria-hidden="true">
+        <defs>
+          <mask id="outside"><rect x="-40" y="-40" width="1080" height="470" fill="#fff"/><text x="0" y="290" font-size="372" textLength="1000" fill="#000">Reyne</text></mask>
+          <clipPath id="reveal"><rect class="draw" x="-40" y="-40" width="1100" height="470"/></clipPath>
+          <clipPath id="inside"><text x="0" y="290" font-size="372" textLength="1000">Reyne</text></clipPath>
+        </defs>
+        <text x="0" y="290" font-size="372" textLength="1000" fill="var(--ink)">Reyne</text>
+        <g clip-path="url(#reveal)">
+          <path d="M-20.0 277.4L-7.0 274.4L6.0 270.9L19.0 267.0L32.0 262.6L45.0 257.9L58.0 252.8L71.0 247.4L84.0 241.8L97.0 235.8L110.0 229.7L123.0 223.4L136.0 217.0L149.0 210.5L162.0 204.0L175.0 197.5L188.0 191.0L201.0 184.6L214.0 178.4L227.0 172.3L240.0 166.5L253.0 160.9L266.0 155.6L279.0 150.6L292.0 146.0L305.0 141.8L318.0 138.0L331.0 134.7L344.0 131.8L357.0 129.4L370.0 127.5L383.0 126.1L396.0 125.3L409.0 125.0L422.0 125.2L435.0 126.0L448.0 127.3L461.0 129.1L474.0 131.4L487.0 134.2L500.0 137.5L513.0 141.2L526.0 145.3L539.0 149.9L552.0 154.8L565.0 160.0L578.0 165.6L591.0 171.4L604.0 177.4L617.0 183.6L630.0 190.0L643.0 196.5L656.0 203.0L669.0 209.5L682.0 216.0L695.0 222.5L708.0 228.8L721.0 234.9L734.0 240.9L747.0 246.6L760.0 252.0L773.0 257.1L786.0 261.9L799.0 266.3L812.0 270.3L825.0 273.9L838.0 277.0L851.0 279.6L864.0 281.7L877.0 283.3L890.0 284.4L903.0 284.9L916.0 284.9L929.0 284.4L942.0 283.4L955.0 281.8L968.0 279.7L981.0 277.2L994.0 274.1L1007.0 270.6L1020.0 266.6" class="cycle" fill="none" stroke="var(--accent)" stroke-width="1.6" vector-effect="non-scaling-stroke" mask="url(#outside)"/>
+        <path d="M-20.0 277.4L-7.0 274.4L6.0 270.9L19.0 267.0L32.0 262.6L45.0 257.9L58.0 252.8L71.0 247.4L84.0 241.8L97.0 235.8L110.0 229.7L123.0 223.4L136.0 217.0L149.0 210.5L162.0 204.0L175.0 197.5L188.0 191.0L201.0 184.6L214.0 178.4L227.0 172.3L240.0 166.5L253.0 160.9L266.0 155.6L279.0 150.6L292.0 146.0L305.0 141.8L318.0 138.0L331.0 134.7L344.0 131.8L357.0 129.4L370.0 127.5L383.0 126.1L396.0 125.3L409.0 125.0L422.0 125.2L435.0 126.0L448.0 127.3L461.0 129.1L474.0 131.4L487.0 134.2L500.0 137.5L513.0 141.2L526.0 145.3L539.0 149.9L552.0 154.8L565.0 160.0L578.0 165.6L591.0 171.4L604.0 177.4L617.0 183.6L630.0 190.0L643.0 196.5L656.0 203.0L669.0 209.5L682.0 216.0L695.0 222.5L708.0 228.8L721.0 234.9L734.0 240.9L747.0 246.6L760.0 252.0L773.0 257.1L786.0 261.9L799.0 266.3L812.0 270.3L825.0 273.9L838.0 277.0L851.0 279.6L864.0 281.7L877.0 283.3L890.0 284.4L903.0 284.9L916.0 284.9L929.0 284.4L942.0 283.4L955.0 281.8L968.0 279.7L981.0 277.2L994.0 274.1L1007.0 270.6L1020.0 266.6" class="cycle" fill="none" stroke="var(--bg)" stroke-width="5" vector-effect="non-scaling-stroke" clip-path="url(#inside)"/>
+        </g>
+      </svg>
+      <!-- 复苏（上升）→ 过热（波峰）→ 滞胀（下降）→ 衰退（波谷） -->
+      <span class="phase" style="left:16%;top:52.6%;transform:translate(-100%,-150%)">复苏</span>
+      <span class="phase" style="left:41%;top:32%;transform:translate(-50%,-170%)">过热</span>
+      <span class="phase" style="left:66%;top:52.6%;transform:translate(10%,-150%)">滞胀</span>
+      <span class="phase" style="left:91%;top:73%;transform:translate(-50%,60%)">衰退</span>
+      <span class="here" style="left:24%;top:42.7%"><i></i><span></span><b>你在这里</b></span>
+    </h1>
+
+    <div class="hero-row">
+      <div>
+        <div class="tag">AI × FinTech · build in public</div>
+        <p class="lines">探索 AI 的边界<br>探索 AI 时代的财富自由之路</p>
+        <div class="btns">
+          <a class="btn" href="#work">查看作品 <span>→</span></a>
+          <a class="btn" href="#contact">联系我 <span>→</span></a>
+        </div>
+      </div>
+      <a class="now" href="#log" id="now">
+        <div class="h"><span>Now building</span><b>10.16</b></div>
+        <p>合规投诉质检方案：统一示例口径，加了虚构数据声明、一页摘要和目录。</p>
+        <div class="f"><span>来自日志 · build in public</span><span>→</span></div>
       </a>
     </div>
-
-    <footer>© Reyne · 页面中的所有案例数据均为模拟生成，不代表任何真实机构。</footer>
   </div>
+</header>
+
+<section class="block reveal" id="about">
+  <div class="wrap">
+    <div class="eyebrow"><b>01</b><i></i>About me</div>
+    <h2>在金融和 <em>AI</em> 的<br>交界处，边学边做。</h2>
+    <div class="about">
+      <div>
+        <p class="lead">我是 Reyne。我关心两件事：AI 到底能做到哪一步，以及一个普通人，能不能靠它走出自己的财富自由之路。</p>
+        <p>所以我在做金融科技方向的东西，用 AI 去碰金融里那些重复、复杂、没人愿意拆开的问题。也在把我学到的周期、投资和 AI，一点点讲给更多人听。</p>
+        <p>我边学边做，也边做边讲。做出来的东西，都放在这里。</p>
+        <div class="sig"><span>— Reyne</span><span>2026 · build in public</span></div>
+      </div>
+      <div>
+        <svg class="venn" viewBox="0 0 220 132" role="img" aria-label="金融与 AI 的交集">
+          <circle cx="78" cy="66" r="60" fill="none" stroke="var(--ink)" stroke-width="1"/>
+          <circle cx="142" cy="66" r="60" fill="none" stroke="var(--ink)" stroke-width="1"/>
+          <text x="52" y="72" text-anchor="middle" font-size="17" fill="var(--ink)" font-family="Noto Serif SC, serif">金融</text>
+          <text x="168" y="73" text-anchor="middle" font-size="20" font-style="italic" fill="var(--ink)" font-family="Playfair Display, serif">AI</text>
+        </svg>
+        <dl class="facts">
+          <div><dt>方向</dt><dd>AI × 金融科技</dd></div>
+          <div><dt>关心</dt><dd>AI 的边界 · 财富自由</dd></div>
+          <div><dt>在学</dt><dd>AI 工具 · SQL · 英语</dd></div>
+          <div><dt>在做</dt><dd>作品集 · 知识类视频</dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block reveal" id="work">
+  <div class="wrap">
+    <div class="work-head">
+      <div>
+        <div class="eyebrow"><b>02</b><i></i>作品 / 项目</div>
+        <h2>Selected <em>work</em></h2>
+      </div>
+      <div>
+        <div class="count"><b id="count">06</b> 个项目 · 持续增加</div>
+        <div class="filters" id="filters" role="group" aria-label="按类型筛选"></div>
+      </div>
+    </div>
+
+    <!-- 新增作品：复制一张卡片，写好 data-cat（risk / video / post / anim）即可，数量和筛选会自动更新 -->
+    <div class="grid" id="grid">
+      <a class="item featured" data-cat="risk" href="/qc-dashboard/">
+        <div class="txt">
+          <div class="meta"><span class="pill">AI × 风控</span><span>2026</span></div>
+          <h3>风控审核质检看板</h3>
+          <p>用 AI 做的风控运营看板原型：抽检、差错归因、审核表现，一屏看清。</p>
+          <div class="go">打开看板 <span>→</span></div>
+        </div>
+        <!-- 数字取自 /qc-dashboard/ 团队总览页（模拟数据，固定随机种子） -->
+        <div class="dash" aria-label="看板片段">
+          <div class="t">质检结果平均 <em>7.1 天</em>才反馈到审核员；宣导后差错率从 <em>15%</em> 降到 <em>6%</em></div>
+          <div class="kpis">
+            <div><small>反馈时效</small><strong>7.1<span>天</span></strong></div>
+            <div><small>质检覆盖率</small><strong>16.6<span>%</span></strong></div>
+            <div><small>差错率 · W8</small><strong>5.3<span>%</span></strong></div>
+          </div>
+          <div class="trend">
+            <div class="h"><span>差错率 · 近 8 周</span><span>W4 宣导</span></div>
+            <svg viewBox="0 0 300 96" aria-hidden="true">
+              <line x1="130" y1="2" x2="130" y2="80" stroke="var(--accent)" stroke-width="1" stroke-dasharray="2 3"/>
+              <polyline fill="none" stroke="var(--ink)" stroke-width="1.5" points="10,8.2 50,22.2 90,6.6 130,27.8 170,59.2 210,74.3 250,62.0 290,68.7"/>
+              <g fill="var(--ink)"><circle cx="10" cy="8.2" r="2.2"/><circle cx="50" cy="22.2" r="2.2"/><circle cx="90" cy="6.6" r="2.2"/><circle cx="130" cy="27.8" r="2.2"/><circle cx="170" cy="59.2" r="2.2"/><circle cx="210" cy="74.3" r="2.2"/><circle cx="250" cy="62.0" r="2.2"/><circle cx="290" cy="68.7" r="2.2"/></g>
+              <text x="10" y="94" text-anchor="middle">W1</text><text x="130" y="94" text-anchor="middle">W4</text><text x="290" y="94" text-anchor="middle">W8</text>
+              <text x="18" y="11.2">16.1%</text><text x="282" y="62.7" text-anchor="end">5.3%</text>
+            </svg>
+          </div>
+          <div class="cap"><span>每一页只给一个结论，共四页</span><span>模拟数据</span></div>
+        </div>
+      </a>
+
+      <a class="item" data-cat="risk" href="/solution/">
+        <div class="meta"><span class="pill">方案 · AI × 合规</span><span>2026</span></div>
+        <h3>银行信用卡合规投诉智能质检解决方案</h3>
+        <p>投诉质检还靠人工抽检 3%–5% 的工单。八章方案：全量机器初筛、高风险人工复核，评分点能追溯到法规条款，附 POC 路径和 ROI 测算框架。</p>
+        <div class="go">阅读方案 <span>→</span></div>
+      </a>
+      <div class="item" data-cat="video">
+        <div class="meta"><span>视频 · 抖音 Mizu</span><span>连载中</span></div>
+        <h3>SQL 科普系列</h3>
+        <p>用一张外卖订单表，把 SQL 讲成普通人也听得懂的话。手绘笔记风。</p>
+        <div class="go mute">在抖音搜 Mizu · 链接待补</div>
+      </div>
+      <div class="item" data-cat="video">
+        <div class="meta"><span>视频 · 抖音 Mizu</span><span>连载中</span></div>
+        <h3>我在学周期</h3>
+        <p>我自己真正想搞懂的东西：周期、投资、理财。边学边拆，讲给你听。</p>
+        <div class="go mute">在抖音搜 Mizu · 链接待补</div>
+      </div>
+      <a class="item" data-cat="post" href="https://www.threads.net/@reyne7_" target="_blank" rel="noopener">
+        <div class="meta"><span>图文 · Threads</span><span>连载中</span></div>
+        <h3>给普通人的 AI 课</h3>
+        <p>六章，从保住账号开始，写给想上手 AI 但不知道从哪开始的人。</p>
+        <div class="go">去看看 <span>→</span></div>
+      </a>
+      <a class="item" data-cat="anim" href="https://www.youtube.com/@oddverse9" target="_blank" rel="noopener">
+        <div class="meta"><span>动画 · YouTube</span><span>EN</span></div>
+        <h3>Oddverse</h3>
+        <p>英文 2D 动画频道，每期一个荒诞的 What If。第一期：如果你再也不用睡觉？</p>
+        <div class="go">去看看 <span>→</span></div>
+      </a>
+      <div class="item next" id="next">＋ 下一个作品正在做。做出来，就放这里。</div>
+    </div>
+  </div>
+</section>
+
+<section class="block reveal" id="log">
+  <div class="wrap">
+    <div class="eyebrow"><b>03</b><i></i>日志 / Log</div>
+    <h2>In <em>progress</em></h2>
+    <!-- 新的一条加在最上面；首屏的 Now building 会自动读取第一条 -->
+    <ol class="log" id="log-list">
+      <li><time datetime="2026-10-16">10.16</time><p>合规投诉质检方案：统一示例口径，加了虚构数据声明、一页摘要和目录。</p><span>合规方案</span></li>
+      <li><time datetime="2026-10-13">10.13</time><p>上线第二个作品：银行信用卡合规投诉智能质检解决方案，一共八章。</p><span>合规方案</span></li>
+      <li><time datetime="2026-10-07">10.07</time><p>看板加了「AI 辅助质检」页：标注由大模型预先生成，网页只读取，不在前端调接口。</p><span>质检看板</span></li>
+      <li><time datetime="2026-10-07">10.07</time><p>看板改版：每一页顶部只给一个结论。</p><span>质检看板</span></li>
+      <li><time datetime="2026-10-07">10.07</time><p>作品集和第一个作品「审核质检看板」原型上线。</p><span>起点</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="block contact" id="contact">
+  <div class="wrap">
+    <div class="eyebrow"><b>04</b><i></i>Contact</div>
+    <div class="hi" id="hi">
+      <svg id="hi-line" aria-hidden="true"></svg>
+      <h2>Say <em>hi.</em><span class="end" id="hi-end"></span></h2>
+    </div>
+    <div class="contact-row">
+      <p class="lead">关于 AI × 金融的工作机会、合作，或者只是想聊聊，都欢迎来找我。</p>
+      <div class="links">
+        <a href="https://x.com/reyne9_" target="_blank" rel="noopener"><span class="p">X</span><small>@reyne9_</small><span class="a">↗</span></a>
+        <a href="https://www.threads.net/@reyne7_" target="_blank" rel="noopener"><span class="p">Threads</span><small>@reyne7_</small><span class="a">↗</span></a>
+        <a href="https://github.com/Reyne7" target="_blank" rel="noopener"><span class="p">GitHub</span><small>Reyne7</small><span class="a">↗</span></a>
+        <a href="https://www.youtube.com/@oddverse9" target="_blank" rel="noopener"><span class="p">YouTube</span><small>@oddverse9</small><span class="a">↗</span></a>
+        <div><span class="p">抖音</span><small>Mizu · 暂无链接</small><span class="a"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Reyne · Built with AI, in public.</span>
+    <a class="top" href="#top">回到顶部 <span>↑</span></a>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+
+  // 主题开关
+  var mq = window.matchMedia('(prefers-color-scheme: dark)');
+  function isDark() { return root.dataset.theme ? root.dataset.theme === 'dark' : mq.matches; }
+  function syncTheme() { root.classList.toggle('is-dark', isDark()); }
+  syncTheme();
+  mq.addEventListener && mq.addEventListener('change', syncTheme);
+  document.getElementById('theme').addEventListener('click', function () {
+    root.dataset.theme = isDark() ? 'light' : 'dark';
+    try { localStorage.setItem('theme', root.dataset.theme); } catch (e) {}
+    syncTheme();
+  });
+
+  // Now building 读取日志第一条
+  var first = document.querySelector('#log-list li');
+  if (first) {
+    document.querySelector('#now .h b').textContent = first.querySelector('time').textContent;
+    document.querySelector('#now p').textContent = first.querySelector('p').textContent;
+  }
+
+  // 作品数量与筛选
+  var grid = document.getElementById('grid');
+  var items = [].slice.call(grid.querySelectorAll('[data-cat]'));
+  var cats = [['all', '全部'], ['risk', 'AI × 风控'], ['video', '视频'], ['post', '图文'], ['anim', '动画']];
+  var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+  document.getElementById('count').textContent = pad(items.length);
+  var box = document.getElementById('filters');
+  cats.forEach(function (c) {
+    var n = c[0] === 'all' ? items.length : items.filter(function (i) { return i.dataset.cat === c[0]; }).length;
+    if (!n) return;
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.dataset.cat = c[0];
+    b.setAttribute('aria-pressed', c[0] === 'all');
+    b.innerHTML = c[1] + '<sup>' + pad(n) + '</sup>';
+    box.appendChild(b);
+  });
+  box.addEventListener('click', function (e) {
+    var b = e.target.closest('button');
+    if (!b) return;
+    box.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', x === b); });
+    var cat = b.dataset.cat;
+    items.forEach(function (i) { i.hidden = cat !== 'all' && i.dataset.cat !== cat; });
+    document.getElementById('next').hidden = cat !== 'all';
+  });
+
+  // 阅读进度 + 当前板块
+  var nav = document.querySelector('nav');
+  var links = [].slice.call(nav.querySelectorAll('ul a'));
+  function onScroll() {
+    var max = document.documentElement.scrollHeight - innerHeight;
+    nav.style.setProperty('--p', (max > 0 ? scrollY / max * 100 : 0) + '%');
+    var cur = null;
+    links.forEach(function (a) {
+      var s = document.querySelector(a.getAttribute('href'));
+      if (s && s.getBoundingClientRect().top < innerHeight * 0.4) cur = a;
+    });
+    links.forEach(function (a) { a.classList.toggle('on', a === cur); });
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // 板块淡入
+  var io = 'IntersectionObserver' in window && new IntersectionObserver(function (es) {
+    es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { rootMargin: '0px 0px -10% 0px' });
+  document.querySelectorAll('.reveal').forEach(function (el) { io ? io.observe(el) : el.classList.add('in'); });
+
+  // 周期线在 Say hi. 收尾：从页面左边进来，停在 hi. 后面的圆点上
+  var hi = document.getElementById('hi'), svg = document.getElementById('hi-line'), end = document.getElementById('hi-end');
+  var drawn = false;
+  function drawHi() {
+    var box = hi.getBoundingClientRect(), e = end.getBoundingClientRect();
+    var h2 = hi.querySelector('h2'), fs = parseFloat(getComputedStyle(h2).fontSize);
+    var x0 = -box.left, ex = e.left - box.left + fs * 0.12, ey = fs * 0.66, amp = fs * 0.07;
+    var d = '';
+    for (var i = 0; i <= 120; i++) {
+      var t = i / 120, x = x0 + (ex - x0) * t;
+      var y = ey + amp * Math.sin(t * Math.PI * 2 * 1.6 + 0.6);
+      var k = Math.max(0, Math.min(1, (t - 0.72) / 0.28));
+      y = y * (1 - k) + ey * k;
+      d += (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
+    }
+    svg.setAttribute('width', box.width);
+    svg.setAttribute('height', box.height);
+    svg.innerHTML = '<path class="hi-path" d="' + d + '" pathLength="1" fill="none" stroke="var(--accent)" stroke-width="1.6" style="stroke-dasharray:1;stroke-dashoffset:' + (drawn ? 0 : 1) + ';transition:stroke-dashoffset 1.6s cubic-bezier(.6,.1,.3,1)"/>' +
+      '<circle cx="' + ex + '" cy="' + ey + '" r="13" fill="none" stroke="var(--accent)" opacity="' + (drawn ? .4 : 0) + '" style="transition:opacity .4s 1.4s"/>' +
+      '<circle cx="' + ex + '" cy="' + ey + '" r="6" fill="var(--accent)" opacity="' + (drawn ? 1 : 0) + '" style="transition:opacity .4s 1.4s"/>';
+  }
+  function showHi() {
+    drawn = true;
+    var p = svg.querySelector('path'); if (p) p.style.strokeDashoffset = 0;
+    svg.querySelectorAll('circle').forEach(function (c, i) { c.setAttribute('opacity', i ? 1 : .4); });
+  }
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(function () {
+    drawHi();
+    if (!io || matchMedia('(prefers-reduced-motion: reduce)').matches) { showHi(); return; }
+    var o = new IntersectionObserver(function (es) {
+      if (es[0].isIntersecting) { requestAnimationFrame(showHi); o.disconnect(); }
+    }, { threshold: 0.4 });
+    o.observe(hi);
+  });
+  var rt; addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(drawHi, 120); });
+})();
+</script>
 </body>
 </html>
