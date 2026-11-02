@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>审批决策引擎 PRD · Reyne 作品集</title>
+  <meta name="description" content="信贷审批决策引擎 / 策略配置平台 PRD：用户与场景、核心概念、策略变更生命周期、功能优先级、关键页面原型、非功能需求与指标。">
+  <link rel="stylesheet" href="../strategy/styles.css">
+  <link rel="stylesheet" href="prd.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="logo" aria-hidden="true">DE</span>
+        <div>
+          <div class="brand-name">审批决策引擎 · 产品需求文档</div>
+          <div class="brand-sub">策略配置 · 回溯测算 · 冠军挑战者 · 版本与审批</div>
+        </div>
+      </div>
+      <a class="back" href="../">← 返回作品集</a>
+    </div>
+    <nav class="toc" aria-label="目录">
+      <div class="toc-inner">
+        <a href="#s1">背景</a><a href="#s2">用户</a><a href="#s3">核心概念</a><a href="#s4">核心流程</a><a href="#s5">功能与优先级</a><a href="#s6">页面原型</a><a href="#s7">非功能需求</a><a href="#s8">指标</a><a href="#s9">风险与取舍</a><a href="#s10">附录</a>
+      </div>
+    </nav>
+  </header>
+
+  <div class="notice" role="note"><div class="notice-inner"><span class="notice-icon" aria-hidden="true">i</span><span><strong>作品集 PRD，场景为虚构。</strong>“回溯测算”原型中的数字来自作品<a href="../strategy/">《信贷审批策略分析》</a>的公开数据结果；其余数值（时效、性能、流量比例等）均为示例。</span></div></div>
+
+  <main class="doc">
+    <div class="headline">
+      <div class="eyebrow">PRD · v1.0 · 作者 Reyne</div>
+      <h1>让策略人员<em>自己</em>改规则、调分数线，并且<em>先测算、再审批、灰度上线</em></h1>
+    </div>
+
+    <div class="card summary">
+      <h2>一页摘要</h2>
+      <div class="sum-grid">
+        <div><b>问题</b><p>策略变更靠提需求让开发改代码，排期以周计；上线前算不清影响，上线后看不到效果；没有版本和审批记录，出问题回滚慢。</p></div>
+        <div><b>产品</b><p>一个给策略人员用的决策引擎：可视化配置规则、评分卡和决策流；改动先回溯测算，再走审批，用冠军挑战者灰度上线，全程留痕、可一键回滚。</p></div>
+        <div><b>MVP</b><p>规则 / 规则集配置、决策流（线性）、回溯测算、上线审批与版本回滚、决策 API 与原因码。冠军挑战者放 V1，可视化画布与规则健康度放 V2。</p></div>
+        <div><b>衡量</b><p>北极星：策略变更从提出到全量上线的周期（目标 1–2 周 → 2 天内，示例）。护栏：上线前做过回溯的变更占比 100%、误配置导致的回滚次数、决策 API P99 时延。</p></div>
+      </div>
+    </div>
+
+    <!-- 1 背景 -->
+    <section class="card" id="s1">
+      <h2>1. 背景与目标</h2>
+      <h3>1.1 现状：策略在代码里</h3>
+      <p>贷前审批的规则和分数线写死在审批系统代码里。行业里常见的情况是：</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>环节</th><th>现在怎么做</th><th>问题</th></tr></thead>
+        <tbody>
+          <tr><td>改策略</td><td>策略人员写需求文档 → 开发排期改代码 → 测试 → 发版</td><td class="wrap">一次调整以周计；市场或风险变化时反应慢</td></tr>
+          <tr><td>上线前测算</td><td>策略人员自己取数、在本地脚本里回溯</td><td class="wrap">口径不统一，评审时各说各的；有的变更干脆不测</td></tr>
+          <tr><td>上线方式</td><td>一次性全量切换</td><td class="wrap">回溯只能看到历史放款客户，新放进来的人表现未知，全量切换风险大</td></tr>
+          <tr><td>上线后</td><td>月度报表才看到通过率、坏账变化</td><td class="wrap">问题发现晚；很难说清哪次变更带来的影响</td></tr>
+          <tr><td>留痕与回滚</td><td>改动记录散在需求单和代码提交里</td><td class="wrap">审计难追溯；出问题要重新发版才能回滚</td></tr>
+          <tr><td>规则存量</td><td>规则只加不减</td><td class="wrap">没人知道哪条还有用，规则互相重叠（见《信贷审批策略分析》中 R04–R07 的增量下降）</td></tr>
+        </tbody>
+      </table></div>
+      <h3>1.2 目标</h3>
+      <ol>
+        <li>策略人员<b>自助完成</b>规则、分数线、决策流的配置，不再依赖开发发版；</li>
+        <li>每一次变更<b>上线前必须回溯测算</b>，口径由平台统一；</li>
+        <li>变更走<b>审批 + 灰度</b>（冠军挑战者），用真实表现决定是否全量；</li>
+        <li>所有版本<b>可追溯、可对比、可一键回滚</b>；</li>
+        <li>线上决策<b>稳定、可解释</b>：每笔决策返回原因码。</li>
+      </ol>
+      <h3>1.3 不做什么</h3>
+      <ul>
+        <li>不做模型训练：评分卡 / 模型由建模团队离线产出，引擎负责部署、调用和监控；</li>
+        <li>不做贷中、贷后决策（额度调整、催收分案）：领域模型预留扩展，V2 之后再评估；</li>
+        <li>不替代审批系统：审批系统通过 API 调用引擎拿决策结果，进件、人工审核流程不变。</li>
+      </ul>
+    </section>
+
+    <!-- 2 用户 -->
+    <section class="card" id="s2">
+      <h2>2. 用户与场景</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>用户</th><th>要做的事</th><th>最在意</th></tr></thead>
+        <tbody>
+          <tr><td><b>策略分析师</b>（核心用户）</td><td class="wrap">新增 / 调整规则，改分数线，测算影响，提交上线，看上线后效果</td><td class="wrap">改得快、算得准、能看到效果</td></tr>
+          <tr><td><b>策略负责人</b></td><td class="wrap">审批变更，决定灰度比例和是否全量，看整体通过率与风险</td><td class="wrap">变更风险可控，出问题能马上回滚</td></tr>
+          <tr><td><b>风控开发 / 运维</b></td><td class="wrap">接入新变量，保证决策服务性能与稳定</td><td class="wrap">配置不会拖垮线上，变量取数可监控</td></tr>
+          <tr><td><b>合规 / 审计</b></td><td class="wrap">查某次策略变更的依据、审批人、上线时间；查某笔申请为什么被拒</td><td class="wrap">完整留痕，拒绝理由可解释</td></tr>
+          <tr><td><b>审批系统</b>（系统用户）</td><td class="wrap">每笔进件调用决策 API</td><td class="wrap">低时延、高可用、结果幂等</td></tr>
+        </tbody>
+      </table></div>
+      <h3>用户故事（节选）</h3>
+      <ul class="stories">
+        <li>作为<b>策略分析师</b>，我想在页面上把“60–89 天逾期 ≥ 1 次”这条规则改成“≥ 2 次”，并立刻看到通过率和坏账率会怎么变，这样我能在评审会上用数据说话。</li>
+        <li>作为<b>策略负责人</b>，我想先让 10% 的流量走新策略，跑够一个观察期再决定是否全量，这样新策略出问题时影响面可控。</li>
+        <li>作为<b>合规</b>，我想输入一个申请编号，看到它命中了哪些规则、分数多少、当时生效的是哪个策略版本。</li>
+      </ul>
+    </section>
+
+    <!-- 3 概念 -->
+    <section class="card" id="s3">
+      <h2>3. 核心概念</h2>
+      <p class="desc">从下往上逐层组装；每一层都有版本号，策略版本是上线、审批、回滚的最小单位。</p>
+      <div class="concepts">
+        <div class="cx"><b>变量</b><span>申请信息、征信、行为数据加工出的字段，如“近 2 年 90 天以上逾期次数”。由开发接入，有口径说明、取数超时与默认值</span></div>
+        <div class="cx"><b>规则</b><span>变量上的条件组合，命中后给出动作（拒绝 / 转人工 / 打标签）和原因码</span></div>
+        <div class="cx"><b>规则集</b><span>一组规则 + 执行方式（全部执行 / 首条命中即停）</span></div>
+        <div class="cx"><b>评分卡 / 模型</b><span>建模团队上传的模型文件或评分卡表，引擎负责调用</span></div>
+        <div class="cx"><b>决策流</b><span>把规则集、评分卡、分数分层、结果节点串起来</span></div>
+        <div class="cx main"><b>策略版本</b><span>某一时刻决策流的完整快照，上线 / 灰度 / 回滚都以它为单位</span></div>
+      </div>
+      <p><b>实验（冠军挑战者）</b>：同一入口下，冠军版本接大部分流量，一个或多个挑战者版本接小部分流量，按申请编号哈希分流，保证同一客户始终落在同一组。</p>
+    </section>
+
+    <!-- 4 流程 -->
+    <section class="card" id="s4">
+      <h2>4. 核心流程</h2>
+      <h3>4.1 策略变更生命周期</h3>
+      <div class="life">
+        <div class="lstep"><i>1</i><b>编辑草稿</b><span>基于当前线上版本复制，改规则、分数线、决策流</span></div>
+        <div class="lstep"><i>2</i><b>回溯测算</b><span>用近期样本对比新旧版本：通过率、坏账率、swap set、规则命中（<b>必做</b>，不做不能提交）</span></div>
+        <div class="lstep"><i>3</i><b>提交审批</b><span>附测算报告和变更说明；负责人审批，可驳回</span></div>
+        <div class="lstep"><i>4</i><b>灰度</b><span>作为挑战者接 5%–20% 流量；设熔断阈值，触发自动停流</span></div>
+        <div class="lstep"><i>5</i><b>全量 / 回滚</b><span>观察期达标后全量；未达标或出问题一键回到上一版本</span></div>
+        <div class="lstep"><i>6</i><b>监控</b><span>通过率、规则命中率、分数分布、早期逾期；异常告警</span></div>
+      </div>
+      <p class="desc">状态机：草稿 → 待审批 →（驳回 → 草稿）→ 已批准 → 灰度中 →（熔断 / 回滚 → 已下线）→ 全量生效 → 已归档。任一时刻同一入口只有一个冠军版本。</p>
+
+      <h3>4.2 一笔申请的实时决策</h3>
+      <div class="flowh">
+        <div class="fn">进件<small>审批系统调用 API</small></div>
+        <div class="fa" aria-hidden="true">→</div>
+        <div class="fn">取数<small>征信、申请、行为变量；超时用默认值或转人工</small></div>
+        <div class="fa" aria-hidden="true">→</div>
+        <div class="fn">分流<small>按申请编号哈希，决定冠军 / 挑战者</small></div>
+        <div class="fa" aria-hidden="true">→</div>
+        <div class="fn hot">硬规则集<small>命中即拒，记原因码</small></div>
+        <div class="fa" aria-hidden="true">→</div>
+        <div class="fn">评分卡<small>计算分数</small></div>
+        <div class="fa" aria-hidden="true">→</div>
+        <div class="fn">分数分层<small>≥ cutoff 通过；灰区转人工；其余拒绝</small></div>
+        <div class="fa" aria-hidden="true">→</div>
+        <div class="fn out">返回结果<small>决策、分数、原因码、版本号</small></div>
+      </div>
+      <p class="desc">每笔决策完整落库（输入变量快照、各节点结果、版本号），用于审计、回溯测算和监控。</p>
+    </section>
+
+    <!-- 5 功能 -->
+    <section class="card" id="s5">
+      <h2>5. 功能清单与优先级</h2>
+      <p><b>排序原则</b>：P0 = 没有它，“自助改策略”这件事就不安全或跑不通；P1 = 让变更更有把握；P2 = 规模化之后的效率与治理。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>模块</th><th>功能</th><th>用户</th><th>优先级</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="2">规则</td><td>规则编辑器：条件构造（变量 / 运算符 / 值 / 与或），动作与原因码</td><td>策略分析师</td><td><span class="p p0">P0</span></td><td class="wrap">编辑时即时显示该规则在回溯样本上的命中率与命中坏账率（见 6.2）</td></tr>
+          <tr><td>规则集：执行方式、规则排序、启停</td><td>策略分析师</td><td><span class="p p0">P0</span></td><td class="wrap"></td></tr>
+          <tr><td rowspan="2">决策流</td><td>线性决策流：规则集 → 评分卡 → 分数分层 → 结果</td><td>策略分析师</td><td><span class="p p0">P0</span></td><td class="wrap">覆盖贷前审批的主流结构</td></tr>
+          <tr><td>可视化画布：分支、并行、子流程</td><td>策略分析师</td><td><span class="p p2">P2</span></td><td class="wrap">客群分层（新客 / 老客）复杂后再做</td></tr>
+          <tr><td>评分卡</td><td>评分卡表上传与版本管理；分数线配置</td><td>建模 / 策略</td><td><span class="p p0">P0</span></td><td class="wrap">模型文件部署（PMML 等）放 P1</td></tr>
+          <tr><td rowspan="2">回溯测算</td><td>新旧版本对比：通过率、坏账率、拒绝量、swap set、规则命中</td><td>策略分析师</td><td><span class="p p0">P0</span></td><td class="wrap">统一样本与口径；提交审批的前置条件（见 6.3）</td></tr>
+          <tr><td>收益测算：可配置好客户收益 / 坏客户损失</td><td>策略负责人</td><td><span class="p p1">P1</span></td><td class="wrap">与《信贷审批策略分析》中 cutoff 选择的方法一致</td></tr>
+          <tr><td rowspan="2">上线</td><td>审批流、版本 diff、一键回滚</td><td>策略负责人</td><td><span class="p p0">P0</span></td><td class="wrap">回滚不需要发版，秒级生效</td></tr>
+          <tr><td>冠军挑战者：流量比例、观察期、熔断阈值</td><td>策略负责人</td><td><span class="p p1">P1</span></td><td class="wrap">MVP 期间用“小流量全量 + 快速回滚”过渡（见 6.4）</td></tr>
+          <tr><td rowspan="2">决策服务</td><td>决策 API、原因码、决策日志落库</td><td>审批系统 / 合规</td><td><span class="p p0">P0</span></td><td class="wrap">见附录 API 示例</td></tr>
+          <tr><td>单笔决策查询：命中路径回放</td><td>合规 / 客服</td><td><span class="p p1">P1</span></td><td class="wrap">输入申请编号，展示当时的版本、变量值、各节点结果</td></tr>
+          <tr><td rowspan="2">监控</td><td>通过率、规则命中率、分数分布 PSI，异常告警</td><td>策略分析师</td><td><span class="p p1">P1</span></td><td class="wrap">规则命中率突变往往比坏账更早暴露问题</td></tr>
+          <tr><td>按版本的 Vintage / 早期逾期对比</td><td>策略负责人</td><td><span class="p p2">P2</span></td><td class="wrap">需要贷后数据回流</td></tr>
+          <tr><td>治理</td><td>规则健康度：长期未命中、增量命中过低的规则提示下线</td><td>策略负责人</td><td><span class="p p2">P2</span></td><td class="wrap">解决“规则只加不减”</td></tr>
+        </tbody>
+      </table></div>
+      <h3>版本规划</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>版本</th><th>范围</th><th>验收</th></tr></thead>
+        <tbody>
+          <tr><td><b>MVP</b></td><td class="wrap">规则 / 规则集、线性决策流、评分卡表与分数线、回溯测算、审批 + 版本 + 回滚、决策 API 与日志</td><td class="wrap">一类产品的贷前策略全部迁入引擎；与旧系统双跑一致率 100%（同输入同结果）</td></tr>
+          <tr><td><b>V1</b></td><td class="wrap">冠军挑战者、收益测算、单笔决策回放、监控告警、模型文件部署</td><td class="wrap">至少一次策略变更通过灰度完成全量</td></tr>
+          <tr><td><b>V2</b></td><td class="wrap">可视化画布、按版本的 Vintage、规则健康度、更多产品接入</td><td class="wrap">策略变更周期稳定在目标以内</td></tr>
+        </tbody>
+      </table></div>
+      <p class="desc"><b>MVP 的关键前提是“双跑一致”</b>：迁移期旧系统和引擎同时计算，结果逐笔比对，一致率 100% 后才切流。迁移出错的代价远大于晚上线。</p>
+    </section>
+
+    <!-- 6 原型 -->
+    <section class="card" id="s6">
+      <h2>6. 关键页面原型</h2>
+      <p class="desc">低保真线框，展示信息结构与关键交互。</p>
+
+      <h3>6.1 决策流（MVP 为线性结构）</h3>
+      <div class="wf">
+        <div class="wf-bar">贷前审批 · 决策流<span>草稿 V13（基于线上 V12）· 最后编辑：策略分析师</span></div>
+        <div class="wf-flow">
+          <div class="node">开始</div><div class="link"></div>
+          <div class="node">取数<small>12 个变量 · 超时 300ms 用默认值</small></div><div class="link"></div>
+          <div class="node hot">硬规则集<small>R01–R03 · 命中即拒</small></div><div class="link"></div>
+          <div class="node changed">策略规则集<small><s>R04–R07</s> 本版本下线</small></div><div class="link"></div>
+          <div class="node">评分卡 v3<small>WOE + 逻辑回归</small></div><div class="link"></div>
+          <div class="node changed">分数分层<small>本版本新增：≥ 590 通过</small></div><div class="link"></div>
+          <div class="node out">结果<small>通过 / 拒绝 + 原因码</small></div>
+        </div>
+        <div class="wf-foot"><span>黄色 = 相对线上版本有改动</span><span class="btn">回溯测算</span><span class="btn pri">提交审批</span></div>
+      </div>
+      <ol class="notes"><li>节点上直接标出相对线上版本的改动，评审时一眼看到“改了什么”。</li><li>“提交审批”在回溯测算完成前不可点。</li></ol>
+
+      <h3>6.2 规则编辑器</h3>
+      <div class="wf">
+        <div class="wf-bar">编辑规则 R02<span>规则集：硬规则集</span></div>
+        <div class="wf-cols">
+          <div class="wf-col">
+            <div class="wf-h">条件</div>
+            <div class="cond"><span class="pill">60–89 天逾期次数</span><span class="pill op">≥</span><span class="pill val">1</span></div>
+            <div class="cond muted">＋ 添加条件（与 / 或）</div>
+            <div class="wf-h">动作</div>
+            <div class="cond"><span class="pill">拒绝</span><span class="pill">原因码 D02：近期有中度逾期</span></div>
+            <div class="wf-h">说明（必填）</div>
+            <div class="field">近 2 年出现过 60–89 天逾期，命中客群坏账率约为整体 5 倍</div>
+          </div>
+          <div class="wf-col side">
+            <div class="wf-h">即时预览 · 回溯样本 45,000 人</div>
+            <div class="pv"><span>命中率</span><b>4.9%</b></div>
+            <div class="pv"><span>命中坏账率</span><b>36.8%</b></div>
+            <div class="pv"><span>增量命中（排在 R01 之后）</span><b>3.2%</b></div>
+            <div class="pv"><span>增量坏账率</span><b>26.0%</b></div>
+            <p class="desc">数字来自《信贷审批策略分析》留出集</p>
+          </div>
+        </div>
+      </div>
+      <ol class="notes"><li>编辑时就能看到命中率，避免“写了一条规则，上线才发现拒了一大片”。</li><li>同时显示<b>增量</b>：这条规则在前面规则之后还能多拦多少人，直接回答“这条规则还有没有必要”。</li></ol>
+
+      <h3>6.3 回溯测算报告（P0，提交审批前必做）</h3>
+      <div class="wf">
+        <div class="wf-bar">回溯测算 · V12（线上）vs V13（草稿）<span>样本：45,000 笔历史申请 · 有表现标签</span></div>
+        <div class="wf-cols">
+          <div class="wf-col">
+            <div class="wf-h">核心指标</div>
+            <table class="mini">
+              <thead><tr><th></th><th class="num">V12 线上</th><th class="num">V13 草稿</th><th class="num">变化</th></tr></thead>
+              <tbody>
+                <tr><td>通过率</td><td class="num">83.1%</td><td class="num">80.8%</td><td class="num neg">−2.3 pp</td></tr>
+                <tr><td>通过客群坏账率</td><td class="num">2.60%</td><td class="num">2.43%</td><td class="num pos">−0.17 pp</td></tr>
+                <tr><td>每百人收益（损失 = 收益 × 10）</td><td class="num">59.3</td><td class="num">59.2</td><td class="num">持平</td></tr>
+              </tbody>
+            </table>
+            <div class="verdict"><b>系统提示</b>：坏账下降，但通过率下降、收益持平。建议以挑战者身份 10% 灰度，观察早期逾期后再决定是否全量。</div>
+          </div>
+          <div class="wf-col side">
+            <div class="wf-h">swap set</div>
+            <div class="sw">
+              <div></div><div class="sh">V13 通过</div><div class="sh">V13 拒绝</div>
+              <div class="sh r">V12 通过</div><div class="sc">35,763<small>坏账率 2.3%</small></div><div class="sc out">换出 1,621<small>坏账率 9.8%</small></div>
+              <div class="sh r">V12 拒绝</div><div class="sc in">换入 607<small>坏账率 11.9%</small></div><div class="sc">7,009<small>坏账率 28.0%</small></div>
+            </div>
+            <p class="desc">换入的 607 人是新放进来的客群：回溯样本里他们有表现，但真实上线后同类客群的表现需要灰度验证。</p>
+          </div>
+        </div>
+        <div class="wf-foot"><span>测算口径与样本由平台统一，报告随审批单存档</span><span class="btn">导出报告</span><span class="btn pri">附报告提交审批</span></div>
+      </div>
+      <ol class="notes"><li><b>报告不替人做决定</b>：只给事实和提示，是否上线由负责人判断；但没有报告不能提交。</li><li>swap set 必须展示：通过率和坏账率都可能“看起来差不多”，换掉的却是完全不同的两批人。</li></ol>
+
+      <h3>6.4 冠军挑战者与上线审批（P0 审批 / P1 灰度）</h3>
+      <div class="wf">
+        <div class="wf-bar">上线 V13<span>审批人：策略负责人</span></div>
+        <div class="wf-cols">
+          <div class="wf-col">
+            <div class="wf-h">流量分配</div>
+            <div class="split"><span class="champ" style="width:90%">冠军 V12 · 90%</span><span class="chal" style="width:10%">10%</span></div>
+            <div class="wf-h">观察期与判定</div>
+            <div class="field">至少 8 周，且挑战者放款 ≥ 3,000 笔；看首期逾期（FPD）和 30 天以上逾期</div>
+            <div class="wf-h">熔断阈值（触发即自动停流并通知）</div>
+            <div class="field">挑战者通过率偏离回溯值 ±5 pp；或任一规则命中率较前 7 日均值变化 &gt; 50%</div>
+          </div>
+          <div class="wf-col side">
+            <div class="wf-h">版本差异</div>
+            <div class="diff del">− 规则集：策略规则集（R04–R07）</div>
+            <div class="diff add">＋ 分数分层：≥ 590 通过</div>
+            <div class="diff">= 硬规则集、评分卡 v3 不变</div>
+            <div class="wf-h">审批记录</div>
+            <div class="field">提交 → 待审批 → 批准（附回溯报告）</div>
+            <div class="btns"><span class="btn">驳回</span><span class="btn pri">批准并开始灰度</span></div>
+          </div>
+        </div>
+      </div>
+      <ol class="notes"><li>观察期写清楚“多久、多少笔、看什么指标”，避免灰度跑了两周就凭感觉全量。</li><li>熔断用<b>先行指标</b>（通过率、规则命中率），因为逾期要几个月才能看到。</li></ol>
+    </section>
+
+    <!-- 7 非功能 -->
+    <section class="card" id="s7">
+      <h2>7. 非功能需求</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>类别</th><th>要求（示例值）</th><th>为什么</th></tr></thead>
+        <tbody>
+          <tr><td>时延</td><td class="wrap">决策 API P99 &lt; 300 ms（不含外部征信取数）</td><td class="wrap">审批是用户在线等待的环节</td></tr>
+          <tr><td>可用性</td><td class="wrap">≥ 99.95%；引擎不可用时审批系统转人工，不允许默认通过</td><td class="wrap">风控兜底原则：宁可慢，不可放</td></tr>
+          <tr><td>降级</td><td class="wrap">单个变量取数超时 → 用配置的默认值并打标；关键变量缺失 → 转人工</td><td class="wrap">避免一个外部数据源拖垮整条决策</td></tr>
+          <tr><td>一致性</td><td class="wrap">同一申请编号重复调用结果一致（幂等）；分流按编号哈希，不随机</td><td class="wrap">避免同一客户多次申请得到不同结果</td></tr>
+          <tr><td>可追溯</td><td class="wrap">每笔决策保存变量快照、节点结果、版本号，保存期限按合规要求</td><td class="wrap">审计、客诉、回溯测算都依赖它</td></tr>
+          <tr><td>权限</td><td class="wrap">编辑、审批、上线分离：编辑人不能审批自己的变更</td><td class="wrap">内控要求</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <!-- 8 指标 -->
+    <section class="card" id="s8">
+      <h2>8. 指标</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>类型</th><th>指标</th><th>口径</th><th>目标（示例）</th></tr></thead>
+        <tbody>
+          <tr><td><b>北极星</b></td><td>策略变更周期</td><td class="wrap">从草稿创建到全量生效（或灰度开始）的中位天数</td><td>2 天内（不含灰度观察期）</td></tr>
+          <tr><td>采纳</td><td>自助变更占比</td><td class="wrap">不经开发改代码完成的策略变更 ÷ 全部策略变更</td><td>≥ 90%</td></tr>
+          <tr><td>质量</td><td>回溯覆盖率</td><td class="wrap">上线前完成回溯测算的变更 ÷ 全部上线变更</td><td>100%（系统强制）</td></tr>
+          <tr><td>质量</td><td>误配置回滚</td><td class="wrap">因配置错误触发的回滚次数；从发现到回滚完成的时长</td><td>回滚 &lt; 5 分钟</td></tr>
+          <tr><td>质量</td><td>回溯偏差</td><td class="wrap">灰度实际通过率 − 回溯预测通过率</td><td>绝对值 &lt; 2 pp</td></tr>
+          <tr><td>稳定性</td><td>决策 API</td><td class="wrap">P99 时延、错误率、降级次数</td><td>见第 7 节</td></tr>
+          <tr><td><b>业务护栏</b></td><td>通过率、FPD、规则命中率</td><td class="wrap">按策略版本拆分；任何一项异常都优先于“变更提速”</td><td>不劣于变更前</td></tr>
+        </tbody>
+      </table></div>
+      <p class="desc">“回溯偏差”专门用来检验回溯测算本身靠不靠谱：如果灰度实际值总偏离回溯值，说明样本或口径有问题，回溯报告的结论就要打折。</p>
+    </section>
+
+    <!-- 9 风险 -->
+    <section class="card" id="s9">
+      <h2>9. 风险与取舍</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>风险</th><th>应对</th></tr></thead>
+        <tbody>
+          <tr><td><b>自助配置 = 更容易配错</b></td><td class="wrap">强制回溯 + 编辑审批分离 + 灰度 + 熔断，四道关；所有改动可一键回滚</td></tr>
+          <tr><td><b>回溯有天然盲区</b></td><td class="wrap">历史数据里只有被放款的人才有表现，新放进来的人（swap-in）表现未知。所以回溯只能用来“筛掉明显不行的方案”，是否全量要看灰度</td></tr>
+          <tr><td><b>灰度太慢</b></td><td class="wrap">逾期要几个月才显现；观察期内用通过率、规则命中率、早期逾期做先行判断，同时允许负责人在充分评估后缩短观察期并留痕</td></tr>
+          <tr><td><b>规则越配越多</b></td><td class="wrap">V2 规则健康度：长期未命中、增量命中过低的规则自动提示下线</td></tr>
+          <tr><td><b>迁移风险</b></td><td class="wrap">MVP 双跑比对，一致率 100% 才切流；先迁一类产品</td></tr>
+          <tr><td><b>做成“大而全”的平台</b></td><td class="wrap">MVP 只做线性决策流，覆盖贷前审批主流结构；画布、子流程等到客群分层确实复杂后再做</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <!-- 10 附录 -->
+    <section class="card" id="s10">
+      <h2>10. 附录：决策 API（示例）</h2>
+      <div class="grid two">
+        <div>
+          <h3>请求</h3>
+<pre><code>POST /v1/decision
+{
+  "request_id": "AP20261102000123",
+  "product": "consumer_loan",
+  "applicant": {
+    "age": 34,
+    "monthly_income": 8500
+  },
+  "bureau_ref": "BR-8f2c..."   // 征信查询凭证，引擎内部取数
+}</code></pre>
+        </div>
+        <div>
+          <h3>响应</h3>
+<pre><code>{
+  "request_id": "AP20261102000123",
+  "decision": "REJECT",          // APPROVE / REJECT / MANUAL
+  "score": 572,
+  "reason_codes": ["S01"],       // S01：综合评分未达标准
+  "policy_version": "V13",
+  "experiment": { "group": "challenger", "traffic": 0.1 },
+  "degraded_vars": [],           // 取数超时用了默认值的变量
+  "latency_ms": 86
+}</code></pre>
+        </div>
+      </div>
+      <p class="desc">原因码面向两类读者：对内（策略、合规）展示命中的具体规则；对外（客户告知）只给合规审定过的通用表述。</p>
+    </section>
+
+    <div class="card related">
+      <b>相关作品</b>
+      <p><a href="../strategy/">《信贷审批策略分析》</a>：本 PRD 中的回溯测算、swap set、收益驱动的 cutoff，在那份分析里有完整的方法和真实数据结果。分析回答“策略应该怎么改”，这个产品回答“改了之后怎么安全地上线”。</p>
+    </div>
+  </main>
+
+  <footer class="page-foot">© Reyne · 作品集 PRD · 场景为虚构，数值除注明外均为示例</footer>
+</body>
+</html>
