@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>信贷审批策略分析 · Reyne 作品集</title>
+  <meta name="description" content="基于 15 万条公开信贷数据的贷前审批策略分析：数据清洗、风险因子与 IV、规则挖掘、评分卡、cutoff 选择、swap set 与可交互的策略模拟器。">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="logo" aria-hidden="true">ST</span>
+        <div>
+          <div class="brand-name">信贷审批策略分析</div>
+          <div class="brand-sub">规则 · 评分卡 · cutoff · swap set</div>
+        </div>
+      </div>
+      <a class="back" href="../">← 返回作品集</a>
+    </div>
+    <nav class="toc" aria-label="目录">
+      <div class="toc-inner">
+        <a href="#sim">策略模拟器</a><a href="#data">数据与清洗</a><a href="#factors">风险因子</a><a href="#rules">规则</a><a href="#score">评分卡</a><a href="#cutoff">cutoff</a><a href="#swap">swap set</a><a href="#takeaway">结论与局限</a>
+      </div>
+    </nav>
+  </header>
+
+  <div class="notice" role="note"><div class="notice-inner"><span class="notice-icon" aria-hidden="true">i</span><span><strong>数据来自 Kaggle 公开数据集 Give Me Some Credit</strong>，15 万名借款人，标签为 2 年内出现 90 天以上逾期。所有效果均在 30% 留出集上评估。收益数字为示例假设。</span></div></div>
+
+  <main>
+    <div class="headline">
+      <div class="eyebrow" id="meta"></div>
+      <h1 id="headline"></h1>
+    </div>
+    <div class="kpis" id="kpis"></div>
+
+    <!-- 策略模拟器 -->
+    <section class="card" id="sim">
+      <div class="card-head">
+        <div>
+          <h2>策略模拟器</h2>
+          <p class="desc">开关规则、拖动分数线，看通过率和坏账率怎么变。基于留出集 <span id="sim-n"></span> 人</p>
+        </div>
+        <div class="seg" id="presets" role="group" aria-label="预设策略">
+          <button type="button" data-preset="rec" aria-pressed="true">推荐策略</button>
+          <button type="button" data-preset="rules">只用 7 条规则</button>
+          <button type="button" data-preset="all">全部通过</button>
+        </div>
+      </div>
+      <div class="sim">
+        <div class="sim-ctrl">
+          <div class="ctrl-group">
+            <div class="ctrl-h">规则（命中即拒）</div>
+            <div id="rule-toggles"></div>
+          </div>
+          <div class="ctrl-group">
+            <div class="ctrl-h">
+              <label><input type="checkbox" id="use-score" checked> 评分卡分数线</label>
+              <b id="cut-val"></b>
+            </div>
+            <input type="range" id="cut-range" min="480" max="700" step="5" aria-label="分数线">
+            <div class="range-ends"><span>480 宽松</span><span>700 严格</span></div>
+          </div>
+          <div class="ctrl-group">
+            <div class="ctrl-h">收益假设：坏客户损失 = 好客户收益 ×</div>
+            <div class="seg small" id="loss" role="group" aria-label="损失倍数">
+              <button type="button" data-l="5">5</button><button type="button" data-l="10" aria-pressed="true">10</button><button type="button" data-l="15">15</button>
+            </div>
+          </div>
+        </div>
+        <div class="sim-out">
+          <div class="sim-kpis" id="sim-kpis"></div>
+          <div class="chart-box"><canvas id="frontier" aria-label="通过率与坏账率的权衡曲线"></canvas></div>
+          <div class="legend" id="frontier-legend"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 数据 -->
+    <section class="card" id="data">
+      <h2>1. 业务问题与数据</h2>
+      <p>某消费信贷产品的贷前审批：<b>在通过率可接受的前提下，尽量把放进来的坏客户挡在门外</b>。“可接受”不拍脑袋，用一个收益假设来定：每放进一个好客户赚 1，每放进一个坏客户亏 L（L 取 5、10、15 做敏感性分析）。</p>
+      <div class="facts" id="facts"></div>
+      <h3>数据清洗：每一条处理都有理由</h3>
+      <div class="table-wrap"><table id="clean-table"></table></div>
+    </section>
+
+    <!-- 风险因子 -->
+    <section class="card" id="factors">
+      <h2>2. 风险因子：信息集中在“逾期”和“额度使用率”</h2>
+      <p class="desc">IV（信息值）衡量一个变量区分好坏客户的能力：&lt; 0.02 无用，0.1–0.3 中等，&gt; 0.3 强。分箱按业务可读的区间手工划分，缺失和异常单独成箱。</p>
+      <div class="grid two">
+        <div><h3>IV 排名</h3><div class="chart-box"><canvas id="iv-chart" aria-label="变量 IV 排名"></canvas></div></div>
+        <div><h3>各分箱违约率</h3><div class="seg small" id="uni-pick" role="group" aria-label="选择变量"></div><div class="chart-box"><canvas id="uni-chart" aria-label="单变量分箱违约率"></canvas></div><p class="desc" id="uni-note"></p></div>
+      </div>
+    </section>
+
+    <!-- 规则 -->
+    <section class="card" id="rules">
+      <h2>3. 规则：命中率、坏账率、提升度、增量</h2>
+      <p class="desc">提升度 = 命中客群坏账率 ÷ 整体坏账率；坏客户捕获 = 这条规则拦下的坏客户占全部坏客户的比例；增量 = 按表中顺序，前面的规则都没拦、这条新拦下的部分。“训练 / 留出”对比用来检查规则是否过拟合。</p>
+      <div class="table-wrap"><table id="rule-table"></table></div>
+      <div class="conclusion" id="rule-note"></div>
+    </section>
+
+    <!-- 评分卡 -->
+    <section class="card" id="score">
+      <h2>4. 评分卡：WOE + 逻辑回归</h2>
+      <div class="grid two">
+        <div>
+          <p class="desc" id="score-desc"></p>
+          <div class="mini-kpis" id="model-kpis"></div>
+          <div class="table-wrap"><table id="coef-table"></table></div>
+        </div>
+        <div><h3>分数段：人数与坏账率（留出集）</h3><div class="chart-box"><canvas id="band-chart" aria-label="分数段人数与坏账率"></canvas></div></div>
+      </div>
+    </section>
+
+    <!-- cutoff -->
+    <section class="card" id="cutoff">
+      <h2>5. cutoff 怎么定：看收益，不看感觉</h2>
+      <p class="desc">策略 = 硬规则 R01–R03 命中即拒 + 分数低于 cutoff 拒绝。纵轴为每位申请人的平均收益（好客户收益记为 1）。</p>
+      <div class="grid two">
+        <div class="chart-box"><canvas id="profit-chart" aria-label="不同 cutoff 下的收益"></canvas></div>
+        <div class="table-wrap"><table id="cutoff-table"></table></div>
+      </div>
+      <div class="conclusion" id="cutoff-note"></div>
+    </section>
+
+    <!-- swap -->
+    <section class="card" id="swap">
+      <h2>6. swap set：换策略，换掉了谁</h2>
+      <p class="desc" id="swap-desc"></p>
+      <div class="swap" id="swap-grid"></div>
+      <div class="conclusion" id="swap-note"></div>
+    </section>
+
+    <!-- 结论 -->
+    <section class="card" id="takeaway">
+      <h2>7. 结论、建议与局限</h2>
+      <h3>结论</h3>
+      <ol id="conclusions"></ol>
+      <h3>上线建议</h3>
+      <ol>
+        <li><b>先灰度，再全量</b>：新策略只接一小部分流量做冠军挑战者测试，和现行策略并行至少一个表现期，用真实逾期数据而不是回溯数据决定是否切换。</li>
+        <li><b>监控</b>：分数分布 PSI（跨月）、各规则命中率、通过率、首期逾期率（FPD）和 Vintage 曲线；规则命中率突变往往比坏账率更早暴露问题。</li>
+        <li><b>评分卡用在规则管不到的地方</b>：在规则之外的“灰区”做 cutoff，同时用于额度和定价分层，而不是推翻现有规则。</li>
+      </ol>
+      <h3>局限</h3>
+      <ol>
+        <li><b>没有时间维度</b>：数据只有一个截面，无法做跨期稳定性（PSI）和 Vintage 分析；留出集与训练集来自同一时期，PSI 接近 0 只说明没过拟合。</li>
+        <li><b>没有拒绝推断</b>：数据里只有被放款的人才有表现，被拒客户的好坏未知；真实策略放宽时，新放进来的人风险可能比回溯估计的更高。</li>
+        <li><b>收益是假设</b>：好客户收益与坏客户损失之比决定最优 cutoff，上线前要用真实的利率、资金成本、违约损失率重算。</li>
+        <li><b>规则阈值</b>：规则取整数阈值（≥ 1 次、≥ 100%），组合规则在探索时看过全量数据，留出集表现可能略偏乐观。</li>
+      </ol>
+      <p class="desc">代码与可复现脚本：<a href="https://github.com/Reyne7/credit-risk-strategy-simulation" target="_blank" rel="noopener">github.com/Reyne7/credit-risk-strategy-simulation</a></p>
+    </section>
+  </main>
+
+  <footer class="page-foot">© Reyne · 作品集 · 数据来自公开数据集，收益为示例假设</footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
