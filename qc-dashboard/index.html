@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>贷前人工审核质检看板</title>
+  <meta name="description" content="贷前人工审核质检看板可交互原型：质检结论从一周以上缩短到次日送达征信员，上线前后对比。所有数据均为模拟生成。">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="logo" aria-hidden="true">QC</span>
+        <div>
+          <div class="brand-name">贷前人工审核质检看板</div>
+          <div class="brand-sub">质检结论次日送达 · 上线前后对比</div>
+        </div>
+      </div>
+      <a class="back" href="../">← 返回作品集</a>
+    </div>
+    <nav class="tabs" aria-label="页面切换">
+      <div class="tabs-inner" role="tablist">
+        <button class="tab" role="tab" id="tab-loop" aria-controls="view-loop" data-view="loop">闭环总览</button>
+        <button class="tab" role="tab" id="tab-reviewers" aria-controls="view-reviewers" data-view="reviewers">征信员画像</button>
+        <button class="tab" role="tab" id="tab-campaign" aria-controls="view-campaign" data-view="campaign">宣导效果追踪</button>
+        <button class="tab" role="tab" id="tab-ai" aria-controls="view-ai" data-view="ai">AI 辅助质检</button>
+      </div>
+    </nav>
+  </header>
+
+  <div class="notice" role="note">
+    <div class="notice-inner"><span class="notice-icon" aria-hidden="true">i</span><span data-notice="default"><strong>所有数据均为模拟生成，不代表任何真实机构。</strong><span class="notice-more">数据由固定随机种子在浏览器中生成，每次打开结果一致。</span></span><span data-notice="ai" hidden><strong>以下标注由大模型预先生成，仅作演示；所有备注均为模拟数据，不代表任何真实机构</strong></span></div>
+  </div>
+
+  <main>
+    <!-- ========== 1. 闭环总览 ========== -->
+    <section class="view" id="view-loop" role="tabpanel" aria-labelledby="tab-loop">
+      <div class="headline">
+        <div class="eyebrow" id="lp-meta"></div>
+        <h1 id="lp-headline"></h1>
+      </div>
+
+      <div class="loop-kpis" id="lp-kpis"></div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h3>一件审核件的质检结论，多久能回到征信员手里</h3>
+            <p class="desc">以一件审核件为例的示意。改进前是常见的按周批量质检：等批次结束再抽样、集中质检、汇总公布</p>
+          </div>
+          <div class="legend" id="lp-gantt-legend"></div>
+        </div>
+        <div class="gantt" id="lp-gantt"></div>
+      </div>
+
+      <div class="grid loop-2">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h3>质检覆盖</h3>
+              <p class="desc">改进前只有抽到的件有人看；改进后每一件都先过 AI，人只看疑似件和抽检件</p>
+            </div>
+          </div>
+          <div class="rings">
+            <figure>
+              <div class="ring-box"><canvas id="lp-ring-0" aria-label="改进前质检覆盖"></canvas><div class="ring-c" id="lp-ring-0-c"></div></div>
+              <figcaption>改进前 · W5–W8</figcaption>
+            </figure>
+            <figure>
+              <div class="ring-box"><canvas id="lp-ring-1" aria-label="改进后质检覆盖"></canvas><div class="ring-c" id="lp-ring-1-c"></div></div>
+              <figcaption>改进后 · W9–W12</figcaption>
+            </figure>
+          </div>
+          <div class="legend ring-legend" id="lp-ring-legend"></div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h3>反馈时效与差错率 · 12 周</h3>
+              <p class="desc">柱：质检结论送达征信员的平均天数；线：差错率（抽检同口径）</p>
+            </div>
+            <div class="legend" id="lp-trend-legend"></div>
+          </div>
+          <div class="chart-box"><canvas id="lp-trend" aria-label="12 周反馈时效与差错率"></canvas></div>
+        </div>
+      </div>
+
+      <div class="grid loop-2">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h3>差错类型 · 12 周</h3>
+              <p class="desc">各类差错发生率（抽检同口径），堆叠后即总差错率</p>
+            </div>
+            <div class="legend" id="lp-types-legend"></div>
+          </div>
+          <div class="chart-box"><canvas id="lp-types" aria-label="12 周差错类型堆叠柱状图"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h3>上线效果检验</h3>
+              <p class="desc">上线前取 W5–W8（宣导后已稳定，避免把宣导的效果算到新流程头上）</p>
+            </div>
+          </div>
+          <div class="table-wrap"><table id="lp-test"></table></div>
+          <div class="conclusion" id="lp-test-note"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h3>月末异常：征信员 × 日期</h3>
+            <p class="desc">每月最后 10 天，格子颜色 = 当日通过率比本人平时高出 15 pp 以上的部分（单日件少，15 pp 以内视为正常波动）；框线内为月末 5 天；当日件量不足 4 件的不显示</p>
+          </div>
+          <div class="legend" id="lp-heat-legend"></div>
+        </div>
+        <div class="heat" id="lp-heat"></div>
+        <div class="heat-notes" id="lp-heat-notes"></div>
+      </div>
+
+      <section class="about" aria-labelledby="about-title">
+        <h2 id="about-title">关于这个原型</h2>
+        <p>信贷审核的人工质检常见做法是按周批量处理：等一个批次结束再抽样，集中质检后汇总公布结果，征信员再看错误、提出争议，之后通过宣导会讲共性问题。<b>一件审核件从审完到征信员知道自己错了，往往要一周以上</b>，这期间同样的错误会继续发生，月末为了考核放松标准的情况，等发现时窗口早已过去。</p>
+        <p>这个产品要做的事只有一件：<b>把质检结论送到征信员手里的时间，从一周以上缩短到次日</b>。做法是审核完成即进入质检池，当晚 AI 全量初筛并标出疑似问题和证据，次日质检员只复核疑似件和抽检件，结论当天推送到征信员本人，争议线上处理。首页对比的就是上线前后这两套流程。</p>
+        <p>后面三页是上线前做的诊断，也是这个产品的需求来源：</p>
+        <ol>
+          <li><b>征信员画像</b>：现行抽样只看件的风险等级、不看人，R07 月末放松标准的情况抽不到多少，等结果公布时已经过去一周多。</li>
+          <li><b>宣导效果追踪</b>：宣导只对“政策理解偏差”有效，另外两类差错没有变化，说明问题不在“不懂”，靠宣导解决不了。</li>
+          <li><b>AI 辅助质检</b>：大模型读审核备注，标出理由不充分、关键核实缺失的片段，并给出建议差错类型和判例；这是新流程里“当晚 AI 初筛”的样子。演示中的标注由大模型预先生成并保存为数据文件，前端不调用任何接口。</li>
+        </ol>
+
+        <h3 id="why-metrics">为什么看这些指标：谁用、解决什么问题</h3>
+        <div class="table-wrap"><table class="about-table">
+          <thead><tr><th>指标</th><th>谁用</th><th>解决什么问题</th><th>看到异常后做什么</th></tr></thead>
+          <tbody>
+            <tr><td>反馈时效</td><td>质检主管</td><td class="wrap">产品的核心目标：征信员多久能知道自己错在哪</td><td class="wrap">超过 1 个工作日的件，追查卡在哪一环（AI 未跑完、复核积压、推送失败）</td></tr>
+            <tr><td>人工复核覆盖</td><td>质检主管</td><td class="wrap">AI 标出的疑似件太多会压垮复核人力，太少又会漏</td><td class="wrap">复核量超出人力时，按改判数据调 AI 阈值，而不是随手砍抽检</td></tr>
+            <tr><td>AI 召回率 / 标出确认率</td><td>质检主管</td><td class="wrap">AI 漏了多少、误报多少</td><td class="wrap">召回下降说明出现了 AI 没见过的新问题，补判例、重新评测</td></tr>
+            <tr><td>差错率（抽检同口径）</td><td>质检主管、组长</td><td class="wrap">最终结果：质量有没有变好</td><td class="wrap">先看趋势和检验结果；样本不够时不下结论</td></tr>
+            <tr><td>月末异常发现用时</td><td>组长</td><td class="wrap">为考核放松标准，越晚发现，放出去的件越多</td><td class="wrap">当天介入谈话，结合贷后表现判断，并回头看考核口径</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3 id="metric-defs">指标口径</h3>
+        <div class="table-wrap"><table class="about-table">
+          <thead><tr><th>指标</th><th>口径</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>反馈时效</td><td class="wrap">（质检结论送达征信员的日期 − 审核日期）的平均天数，只算被人工质检的件</td><td class="wrap">改进前送达日 = 批次结果公布日；改进后 = 复核次日推送日（遇周末顺延）</td></tr>
+            <tr><td>人工复核覆盖</td><td class="wrap">被人工看过的件数 ÷ 审核件数</td><td class="wrap">改进后 = AI 疑似件 ∪ 抽检件；AI 初筛覆盖 100%</td></tr>
+            <tr><td>差错率（抽检同口径）</td><td class="wrap">Σ 各层（该层件量占比 × 该层抽检差错率）</td><td class="wrap">两期用同一套分层随机抽检（高风险 30% / 渠道风险线索 20% / 低风险 10%），并按层加权还原到全量。AI 标出的件不进这个口径：改进后检出的差错件数一定变多，那是看得更全了，不是质量变差</td></tr>
+            <tr><td>AI 召回率</td><td class="wrap">抽检件中有差错且被 AI 标出的件数 ÷ 抽检件中有差错的件数</td><td class="wrap">只能用抽检件算：没被 AI 标出、也没被抽到的件，没人知道有没有错</td></tr>
+            <tr><td>AI 标出确认率</td><td class="wrap">AI 标出且复核确认为差错的件数 ÷ AI 标出的件数</td><td class="wrap">衡量误报，决定复核人力够不够</td></tr>
+            <tr><td>月末异常发现用时</td><td class="wrap">首次有质检结论指出该征信员月末异常的日期 − 当月月末窗口第一天</td><td class="wrap">月末窗口 = 每月最后 5 个自然日；异常判定规则见“征信员画像”页</td></tr>
+            <tr><td>效果检验</td><td class="wrap">双比例 z 检验，双尾，α = 0.05</td><td class="wrap">上线前 W5–W8 vs 上线后 W9–W12，均为抽检件</td></tr>
+          </tbody>
+        </table></div>
+
+        <p><b>这套对比的局限（真上线时要处理）</b>：</p>
+        <ol>
+          <li><b>没有对照组</b>：前后对比排除不了同期其他因素。真上线建议按组灰度：审核一组先用新流程、二组晚两周，用双重差分看效果。</li>
+          <li><b>样本量不够</b>：抽检监控样本每周只有一百件左右，差错率一两个百分点的变化要很多周才能检出，所以上线初期主要看过程指标。</li>
+          <li><b>模拟假设</b>：上线后的数据基于三个假设：征信员收到本人某类差错的反馈后，该类差错倾向降为原来的 35%；AI 对有差错件的召回为 88%、对无差错件的误标为 6%；月末异常被反馈后组长当天介入。真实效果要用灰度数据验证。</li>
+        </ol>
+        <p class="desc">本页面为纯前端原型，所有数据均为模拟生成，不代表任何真实机构。</p>
+      </section>
+    </section>
+
+    <!-- ========== 2. 征信员画像 ========== -->
+    <section class="view" id="view-reviewers" role="tabpanel" aria-labelledby="tab-reviewers" hidden>
+      <div class="headline">
+        <div class="eyebrow">上线前诊断 · 征信员画像 · W1–W8 全部人工审核件</div>
+        <h1 id="rv-headline"></h1>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h3>征信员行为指标</h3>
+            <p class="desc">按月末偏移从高到低排序，点击任一行查看详情。月末偏移 = 每月最后 5 天通过率 − 其余日期通过率；超过 15 pp 且同时出现分歧率上升（+8 pp 以上）或审核时长骤降（−25% 以上）时标记为“月末异常”。</p>
+          </div>
+        </div>
+        <div class="table-wrap"><table id="rv-table" class="rv-table"></table></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h3>质检员尺度对比</h3>
+            <p class="desc" id="qc-desc"></p>
+          </div>
+        </div>
+        <div class="chart-box short"><canvas id="qc-chart" aria-label="质检员判定差错率偏离团队均值"></canvas></div>
+        <div class="table-wrap"><table id="qc-table"></table></div>
+      </div>
+    </section>
+
+    <!-- ========== 3. 宣导效果追踪 ========== -->
+    <section class="view" id="view-campaign" role="tabpanel" aria-labelledby="tab-campaign" hidden>
+      <div class="headline">
+        <div class="eyebrow" id="cp-meta"></div>
+        <h1 id="cp-headline"></h1>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h3>三类差错 8 周发生率</h3>
+            <p class="desc">发生率 = 该类差错件数 ÷ 当周被质检件数</p>
+          </div>
+          <div class="legend" id="cp-legend"></div>
+        </div>
+        <div class="chart-box tall"><canvas id="cp-chart" aria-label="三类差错周发生率曲线"></canvas></div>
+      </div>
+
+      <div class="grid half">
+        <div class="card">
+          <h3>宣导前后对比</h3>
+          <p class="desc">宣导前 W1–W3，宣导后 W5–W8（W4 为过渡周不计入）；双比例 z 检验，α = 0.05</p>
+          <div class="table-wrap"><table id="cp-table"></table></div>
+        </div>
+        <div class="card">
+          <h3>宣导记录</h3>
+          <div id="cp-record"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 4. AI 辅助质检 ========== -->
+    <section class="view" id="view-ai" role="tabpanel" aria-labelledby="tab-ai" hidden>
+      <div id="ai-body"><p class="desc" style="margin-top:24px">加载中…</p></div>
+    </section>
+  </main>
+
+  <footer class="foot">© Reyne · 作品集原型 · 模拟数据，仅供演示</footer>
+
+  <div class="overlay" id="rv-overlay" hidden>
+    <div class="drawer" role="dialog" aria-modal="true" aria-labelledby="rv-detail-title">
+      <div class="drawer-head">
+        <div>
+          <h3 id="rv-detail-title"></h3>
+          <div class="drawer-sub" id="rv-detail-sub"></div>
+        </div>
+        <span id="rv-detail-flag"></span>
+        <button type="button" class="close" id="rv-close">关闭</button>
+      </div>
+      <div class="drawer-body">
+        <div class="mini-kpis" id="rv-detail-kpis"></div>
+        <div class="grid half">
+          <div class="card">
+            <div class="card-head">
+              <h3>周趋势</h3>
+              <div class="legend" id="rv-week-legend"></div>
+            </div>
+            <div class="chart-box short"><canvas id="rv-week-chart" aria-label="征信员周趋势"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <h3>逐日通过率</h3>
+              <div class="legend" id="rv-day-legend"></div>
+            </div>
+            <div class="chart-box short"><canvas id="rv-day-chart" aria-label="征信员逐日通过率"></canvas></div>
+            <p class="desc">仅显示当日件量 ≥ 4 的日期</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h3>审核件列表</h3>
+              <p class="desc" id="rv-case-count"></p>
+            </div>
+            <div class="seg" id="rv-case-filter">
+              <button type="button" data-filter="all" aria-pressed="true">全部</button>
+              <button type="button" data-filter="monthEnd" aria-pressed="false">月末窗口</button>
+              <button type="button" data-filter="diverge" aria-pressed="false">与模型分歧</button>
+              <button type="button" data-filter="error" aria-pressed="false">质检差错</button>
+            </div>
+          </div>
+          <div class="table-wrap"><table id="rv-case-table"></table></div>
+          <div class="pager" id="rv-pager"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

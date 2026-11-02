@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reyne 作品集</title>
+  <meta name="description" content="Reyne 的个人作品集：风控产品 / 智能风控 / 风控策略。">
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f3f5f8;
+      --surface: #ffffff;
+      --border: #e1e5eb;
+      --text: #1d2129;
+      --text-2: #4e5969;
+      --muted: #7a8494;
+      --brand: #1a4f8b;
+      --brand-soft: #e8f0fa;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --bg: #121416; --surface: #1a1c1f; --border: #2f343b;
+        --text: #f2f3f5; --text-2: #c3c7ce; --muted: #8d95a1;
+        --brand: #6fa3e0; --brand-soft: #1d2a3b;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #121416; --surface: #1a1c1f; --border: #2f343b;
+      --text: #f2f3f5; --text-2: #c3c7ce; --muted: #8d95a1;
+      --brand: #6fa3e0; --brand-soft: #1d2a3b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", "Segoe UI", sans-serif;
+      line-height: 1.7;
+    }
+    .wrap { max-width: 880px; margin: 0 auto; padding: 56px 16px 40px; }
+    header h1 { font-size: 40px; margin: 0; letter-spacing: 1px; }
+    header .role { font-size: 18px; color: var(--brand); font-weight: 600; margin: 4px 0 10px; }
+    header p { color: var(--text-2); margin: 0; max-width: 640px; }
+    h2 { font-size: 15px; color: var(--muted); font-weight: 600; letter-spacing: 2px; margin: 48px 0 14px; }
+    .works { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+    .work {
+      display: block;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 18px 20px;
+      color: inherit;
+      text-decoration: none;
+      transition: border-color .15s, transform .15s;
+    }
+    .work:hover, .work:focus-visible { border-color: var(--brand); transform: translateY(-2px); outline: none; }
+    .work .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .work .tags span { font-size: 12px; color: var(--brand); background: var(--brand-soft); border-radius: 10px; padding: 1px 8px; }
+    .work h3 { margin: 0 0 6px; font-size: 17px; }
+    .work p { margin: 0; font-size: 14px; color: var(--text-2); }
+    .work .go { display: inline-block; margin-top: 12px; font-size: 14px; color: var(--brand); font-weight: 600; }
+    .work.placeholder { border-style: dashed; color: var(--muted); display: flex; align-items: center; justify-content: center; min-height: 140px; font-size: 14px; }
+    .focus { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 6px; max-width: 680px; }
+    .focus li { color: var(--text-2); font-size: 14px; display: flex; gap: 12px; align-items: baseline; }
+    .focus b { flex: none; width: 5.5em; color: var(--brand); font-weight: 600; }
+    footer { color: var(--muted); font-size: 12px; margin-top: 56px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Reyne</h1>
+      <div class="role">求职方向：风控产品 / 智能风控 / 风控策略</div>
+      <p>我有4年金融机构风控经验，擅长从问题件里找原因，现在把这些经验做成产品：拆需求、定指标口径、画原型，再用数据验证方案是否有效。</p>
+      <ul class="focus">
+        <li><b>风控产品</b>用户与流程梳理、功能优先级、页面原型、人机协同设计</li>
+        <li><b>智能风控</b>大模型辅助质检、RAG 知识库、置信度分流与人工复核</li>
+        <li><b>风控策略</b>指标口径、异常识别规则、宣导前后显著性检验</li>
+      </ul>
+    </header>
+
+    <h2>作品</h2>
+    <div class="works">
+      <a class="work" href="qc-dashboard/">
+        <div class="tags"><span>产品</span><span>策略</span><span>AI 初筛</span><span>上线前后对比</span><span>可视化看板</span></div>
+        <h3>贷前人工审核质检看板</h3>
+        <p>质检结论从一周以上才到征信员手里，缩短到次日送达。看板对比上线前后：反馈链路、质检覆盖、月末异常发现用时、差错率与显著性检验；下钻页是上线前的诊断：征信员画像、宣导效果、AI 辅助质检。数据为模拟生成。</p>
+        <span class="go">打开看板 →</span>
+      </a>
+      <a class="work" href="solution/">
+        <div class="tags"><span>产品方案</span><span>合规投诉</span><span>智能质检</span><span>RAG</span></div>
+        <h3>信用卡合规投诉智能质检 · 产品方案</h3>
+        <p>四类用户的痛点、核心流程图、功能清单与 P0/P1/P2 优先级、质检复核工作台等关键页面原型，以及评测指标和转人工规则（分类准确率、高风险召回率、哪些情况必须人工复核）。文中数据为示例参数。</p>
+        <span class="go">阅读方案 →</span>
+      </a>
+      <div class="work placeholder">整理中：RPA 项目复盘 PRD</div>
+    </div>
+
+    <footer>© Reyne · 页面中的所有案例数据均为模拟生成，不代表任何真实机构。</footer>
+  </div>
+</body>
+</html>

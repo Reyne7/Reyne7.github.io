@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>信用卡合规投诉智能质检 · 产品方案 · Reyne 作品集</title>
+<meta name="description" content="信用卡合规投诉智能质检产品方案：用户与痛点、核心流程、功能优先级、关键页面原型、评测指标与人工复核机制。">
+<style>
+  :root {
+    --fg: #1a1a1a; --muted: #6b7280; --line: #e5e7eb; --cell: #d1d5db; --soft: #f8fafc; --head: #f3f4f6; --card: #fff;
+    --brand: #2563eb; --brand-soft: #eff4ff; --ai: #7c3aed; --ai-soft: #f3efff; --human: #c2410c; --human-soft: #fff4ed;
+    --hl: #fef08a; --ok: #15803d; --ok-soft: #ecfdf3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --fg: #e5e7eb; --muted: #9ca3af; --line: #374151; --cell: #374151; --soft: #1f2937; --head: #1f2937; --card: #111827;
+      --brand: #60a5fa; --brand-soft: #172338; --ai: #a78bfa; --ai-soft: #231b38; --human: #fb923c; --human-soft: #34200f;
+      --hl: #713f12; --ok: #4ade80; --ok-soft: #10291a;
+    }
+    body { background: #111827; }
+  }
+  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; line-height: 1.75; color: var(--fg); max-width: 880px; margin: 0 auto; padding: 24px 16px 64px; }
+  nav { font-size: 14px; margin-bottom: 8px; }
+  nav a { color: var(--brand); text-decoration: none; margin-right: 16px; }
+  a { color: var(--brand); }
+  h1 { font-size: 26px; line-height: 1.4; }
+  h2 { font-size: 21px; border-bottom: 1px solid var(--line); padding-bottom: 6px; margin-top: 40px; }
+  h3 { font-size: 17px; margin-top: 26px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; margin: 12px 0; display: block; overflow-x: auto; }
+  th, td { border: 1px solid var(--cell); padding: 6px 9px; text-align: left; vertical-align: top; }
+  th { background: var(--head); white-space: nowrap; }
+  blockquote { border-left: 3px solid var(--brand); margin: 12px 0; padding: 4px 14px; background: var(--soft); }
+  hr { border: none; border-top: 1px solid var(--line); margin: 28px 0; }
+  .notice { background: #fef9c3; border: 1px solid #facc15; color: #713f12; border-radius: 6px; padding: 8px 14px; font-size: 14px; margin: 12px 0; }
+  @media (prefers-color-scheme: dark) { .notice { background: #422006; border-color: #a16207; color: #fde68a; } }
+  .summary { border: 1px solid var(--cell); border-radius: 8px; padding: 4px 18px 10px; background: var(--soft); margin: 18px 0; }
+  .summary h2 { border: none; margin-top: 12px; }
+  .toc { font-size: 14px; line-height: 2; }
+  .toc a { text-decoration: none; margin-right: 14px; white-space: nowrap; }
+  .desc { color: var(--muted); font-size: 13.5px; }
+
+  /* 产品架构 */
+  .arch { margin: 12px 0; }
+  .arch .layer { display: flex; flex-wrap: wrap; gap: 8px; border: 1px solid var(--cell); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; background: var(--soft); }
+  .arch .layer b { flex: 0 0 100%; font-size: 13px; color: var(--brand); }
+  .arch .layer span { flex: 1 1 150px; background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; font-size: 13px; line-height: 1.5; }
+
+  /* 优先级标签 */
+  .p { display: inline-block; font: 600 12px/1.6 -apple-system, sans-serif; padding: 0 7px; border-radius: 9px; white-space: nowrap; }
+  .p0 { background: var(--human-soft); color: var(--human); }
+  .p1 { background: var(--brand-soft); color: var(--brand); }
+  .p2 { background: var(--head); color: var(--muted); }
+
+  /* 流程图 */
+  .flow { border: 1px solid var(--cell); border-radius: 10px; padding: 16px 14px 18px; margin: 14px 0; background: var(--soft); }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12.5px; color: var(--muted); margin-bottom: 14px; }
+  .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; border: 1.5px solid; }
+  .stage { font-size: 12px; font-weight: 600; letter-spacing: 1px; color: var(--muted); margin: 14px 0 6px; text-align: center; }
+  .stage:first-of-type { margin-top: 0; }
+  .node { margin: 0 auto; max-width: 420px; border: 1.5px solid var(--cell); background: var(--card); border-radius: 8px; padding: 7px 12px; font-size: 14px; line-height: 1.55; text-align: center; }
+  .node small { display: block; color: var(--muted); font-size: 12.5px; }
+  .node.ai { border-color: var(--ai); background: var(--ai-soft); }
+  .node.human { border-color: var(--human); background: var(--human-soft); }
+  .node.dec { border-style: dashed; border-color: var(--fg); font-weight: 600; max-width: 340px; }
+  .arrow { width: 0; height: 22px; margin: 0 auto; border-left: 1.5px solid var(--muted); position: relative; }
+  .arrow::after { content: ""; position: absolute; left: -5px; bottom: -1px; border: 4.5px solid transparent; border-top: 6px solid var(--muted); border-bottom: 0; }
+  .branch { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 640px; margin: 0 auto; }
+  .branch > div { display: flex; flex-direction: column; align-items: stretch; }
+  .branch .lbl { text-align: center; font-size: 12.5px; color: var(--muted); }
+  .branch .node { width: 100%; box-sizing: border-box; }
+  .loop { max-width: 640px; margin: 10px auto 0; font-size: 12.5px; color: var(--human); text-align: center; border-top: 1px dashed var(--human); padding-top: 6px; }
+
+  /* 原型线框 */
+  .wf { border: 1.5px solid var(--cell); border-radius: 10px; overflow: hidden; margin: 14px 0 8px; background: var(--card); font-size: 13px; line-height: 1.55; }
+  .wf-bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; padding: 8px 12px; background: var(--head); border-bottom: 1px solid var(--cell); font-weight: 600; }
+  .wf-bar span { font-weight: 400; color: var(--muted); font-size: 12.5px; }
+  .wf-body { display: grid; gap: 0; }
+  .wf-3 { grid-template-columns: 190px 1fr 250px; }
+  .wf-2 { grid-template-columns: 1fr 260px; }
+  .wf-col { padding: 10px 12px; border-right: 1px solid var(--line); min-width: 0; }
+  .wf-col:last-child { border-right: 0; }
+  .wf-h { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
+  .q { border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; margin-bottom: 6px; }
+  .q.on { border-color: var(--brand); background: var(--brand-soft); }
+  .q b { display: block; font-size: 12.5px; }
+  .chip { display: inline-block; font-size: 11.5px; padding: 0 6px; border-radius: 8px; margin: 2px 3px 0 0; background: var(--head); color: var(--muted); white-space: nowrap; }
+  .chip.hot { background: var(--human-soft); color: var(--human); }
+  .chip.ai { background: var(--ai-soft); color: var(--ai); }
+  .chip.ok { background: var(--ok-soft); color: var(--ok); }
+  .ts { color: var(--muted); font-family: ui-monospace, Menlo, monospace; font-size: 12px; margin-right: 6px; }
+  .line { margin: 0 0 6px; }
+  mark { background: var(--hl); color: inherit; padding: 0 2px; border-radius: 2px; }
+  .sp { border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; margin-bottom: 6px; }
+  .sp.flag { border-color: var(--human); }
+  .sp .r { display: flex; justify-content: space-between; gap: 6px; align-items: baseline; }
+  .sp .src { color: var(--muted); font-size: 12px; }
+  .btns { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+  .b { border: 1px solid var(--cell); border-radius: 5px; padding: 1px 9px; font-size: 12px; background: var(--card); }
+  .b.pri { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .field { border: 1px solid var(--line); border-radius: 5px; padding: 4px 8px; margin: 3px 0 8px; color: var(--muted); }
+  .wf-foot { border-top: 1px solid var(--line); padding: 8px 12px; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center; color: var(--muted); }
+  .wf table { margin: 0; font-size: 12.5px; display: table; }
+  .notes { font-size: 14px; margin-top: 4px; }
+  .notes li { margin-bottom: 4px; }
+  .num { display: inline-grid; place-items: center; width: 17px; height: 17px; border-radius: 50%; background: var(--brand); color: #fff; font-size: 11px; font-weight: 700; margin-right: 4px; vertical-align: 1px; }
+  @media (max-width: 720px) {
+    .wf-3, .wf-2 { grid-template-columns: 1fr; }
+    .wf-col { border-right: 0; border-bottom: 1px solid var(--line); }
+    .wf-col:last-child { border-bottom: 0; }
+    .branch { gap: 8px; }
+    .node { font-size: 13px; padding: 6px 8px; }
+  }
+</style>
+</head>
+<body>
+<nav><a href="../">← 作品集首页</a><a href="../qc-dashboard/">作品一：贷前人工审核质检看板</a></nav>
+<h1>信用卡合规投诉智能质检 · 产品方案</h1>
+<blockquote>
+<p>文档性质：产品方案作品（作者独立撰写，内容与数据均为虚构示例）<br>
+产品形态：银行信用卡中心投诉处理与质检部门内部使用的智能质检系统，对接现有工单系统与录音系统<br>
+说明：文中不涉及任何真实机构名称；业务量级、比例、阈值均为示例参数，实际以业务数据校准。</p>
+</blockquote>
+<div class="notice"><strong>声明：</strong>本页为作者独立撰写的求职作品，不含任何原单位内部资料；未使用真实机构名称、制度原文或真实工单。文中所有业务量级、比例、阈值与页面中的工单内容均为<strong>虚构的示例</strong>，不代表任何真实机构或实测结果。</div>
+
+<div class="summary">
+<h2>一页摘要</h2>
+<ul>
+<li><strong>给谁用</strong>：投诉处理岗、质检员、质检主管 / 合规岗、消保管理岗四类用户。</li>
+<li><strong>解决什么</strong>：投诉质检靠人工抽检（示例：约 5%），口径因人而异；高风险投诉靠经验识别，发现得晚；处置依据靠翻制度、问老员工。</li>
+<li><strong>产品怎么做</strong>：机器做全量初筛、分类和一致性判断，人做高风险定性和最终裁决。规则类评分点可复算，语义类评分点必须给出证据片段；命中高风险或置信度低的，一律转人工。</li>
+<li><strong>MVP 范围</strong>：选 1 类高频投诉，做通“结案 → 自动质检 → 分流 → 人工复核 → 改判回流”这一条闭环，外加接入时的高风险标记（P0）。知识库助手、整改闭环放 V1，聚集预警和驾驶舱下钻放 V2。</li>
+<li><strong>怎么判断做对了</strong>：分类准确率 ≥ 90%、高风险召回率 ≥ 95%、质检一致性 ≥ 85%（均为示例门槛），同时盯漏检率和改判率；达不到就不扩大范围。</li>
+</ul>
+<div class="toc"><a href="#s1">1 背景与目标</a><a href="#s2">2 用户与痛点</a><a href="#s3">3 核心流程</a><a href="#s4">4 功能清单与优先级</a><a href="#s5">5 功能设计</a><a href="#s6">6 页面原型</a><a href="#s7">7 评测与人工复核</a><a href="#s8">8 上线验证</a><a href="#s9">9 风险</a><a href="#appendix-a">附录</a></div>
+</div>
+
+<hr />
+<h2 id="s1">1. 背景与产品目标</h2>
+<h3>1.1 背景</h3>
+<p>银行保险机构消费者权益保护监管持续趋严，投诉处理已从“服务问题”升级为“合规问题”：</p>
+<ul>
+<li><strong>时效硬约束</strong>：监管对投诉受理、处理、回复有时限要求（具体以适用的监管与行内制度为准），逾期会影响消保监管评价；</li>
+<li><strong>征信类投诉敏感度极高</strong>：征信异议类投诉处理出错，可能引发监管转办和声誉风险；</li>
+<li><strong>量在涨，人没涨</strong>：投诉量随业务量增长，处理和质检人力无法同比扩张；</li>
+<li><strong>检查看过程</strong>：监管与内审不只看结果，还看过程留痕（录音、话术、时效），质检本身就是证据链的一环。</li>
+</ul>
+<h3>1.2 产品目标</h3>
+<ol>
+<li>质检覆盖从人工抽样约 5%（示例）变为<strong>全量机器初筛 + 高风险人工复核</strong>；</li>
+<li>建立<strong>统一、可解释、可申诉</strong>的评分点体系，每个评分点能追溯到法规与行内制度条款；</li>
+<li>投诉接入时<strong>自动分类分级</strong>，高风险投诉分钟级识别、优先派单；</li>
+<li>把法规制度和历史复杂案件沉淀为<strong>可检索、带出处的知识库</strong>，缩短新人上手周期。</li>
+</ol>
+<h3>1.3 不做什么</h3>
+<ul>
+<li>不做无人化：重大问题定性、客户最终回复、结案结论，系统只给建议，不自动执行；</li>
+<li>不替换现有工单、录音系统，只读接入；</li>
+<li>MVP 不做排名通报：先用于辅导和风险拦截，避免一线把它当“找茬工具”。</li>
+</ul>
+
+<hr />
+<h2 id="s2">2. 用户与痛点</h2>
+<h3>2.1 四类用户</h3>
+<table>
+<thead><tr><th>用户</th><th>在流程里做什么</th><th>现在的痛点</th><th>产品要帮他做到</th></tr></thead>
+<tbody>
+<tr><td><strong>投诉处理岗</strong></td><td>接单、调查取证、拟方案、回复客户、结案</td><td>多诉点案件拆不清；查制度、找相似案例耗时；分派到其他部门取证靠邮件追</td><td>接单时就知道案件类型和风险等级；处置时直接看到适用条款和相似案例，带出处</td></tr>
+<tr><td><strong>质检员</strong></td><td>抽样、听录音、按打分表评分</td><td>只能覆盖约 5%（示例）的工单；逐条听录音效率低；同一问题不同人定性不同</td><td>只看机器筛出来的问题件和疑似件；证据片段直接定位到录音时间点；改判有依据、可留痕</td></tr>
+<tr><td><strong>质检主管 / 合规岗</strong></td><td>维护质检标准、处理争议和申诉、出质检报告</td><td>标准散在文档里，执行靠个人理解；整改跟踪靠 Excel，闭环容易断</td><td>评分点结构化配置、可灰度上线；能看到哪个评分点改判多、哪里标准不清</td></tr>
+<tr><td><strong>消保管理岗</strong></td><td>看整体投诉与质检情况，应对监管检查</td><td>问题靠抽查偶然暴露；数据靠人工汇总，出得慢</td><td>高风险和聚集性投诉第一时间推送；质检与整改数据自动汇总，可下钻</td></tr>
+</tbody>
+</table>
+
+<h3>2.2 现状流程中的断点</h3>
+<table>
+<thead><tr><th>#</th><th>环节</th><th>责任角色</th><th>现在怎么做</th><th>断点</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>投诉接入登记</td><td>客服 / 投诉岗</td><td>来电、线上渠道、监管转办单 → 登记工单</td><td>渠道多、重复登记、要素缺失</td></tr>
+<tr><td>2</td><td>分类分级</td><td>投诉处理岗</td><td>凭经验判断类型与紧急程度</td><td>口径不一，涉征信、涉监管转办的高风险件识别慢</td></tr>
+<tr><td>3</td><td>调查核实</td><td>处理岗 / 各相关部门</td><td>调申请资料、征信记录、通话录音</td><td>跨系统查询，证据链靠人拼</td></tr>
+<tr><td>4</td><td>方案与回复</td><td>处理岗 / 主管</td><td>拟方案、分级审批、回复客户</td><td>法规依据靠人工翻查，话术合规靠个人把控</td></tr>
+<tr><td>5</td><td>事后质检</td><td>质检岗</td><td>结案后随机抽样 → 听录音 → 打分</td><td>覆盖低、风险导向不足、尺度不一</td></tr>
+<tr><td>6</td><td>整改跟踪</td><td>质检岗 / 一线</td><td>问题清单 → 整改回执</td><td>靠 Excel 跟踪，闭环易断，数据难沉淀</td></tr>
+</tbody>
+</table>
+<p><strong>小结</strong>：流程骨架是健康的，问题在“人肉执行”：分类、查证、打分、跟踪四个环节都在用熟练人力做重复判断。适合机器做全量初筛和一致性判断，人做高风险定性和最终裁决。</p>
+
+<h3>2.3 从痛点到需求</h3>
+<table>
+<thead><tr><th>痛点</th><th>根因</th><th>需求</th><th>对应功能</th></tr></thead>
+<tbody>
+<tr><td>质检覆盖低</td><td>人工逐条听录音，产能有上限</td><td>结案件全部自动初筛，人只看问题件</td><td>智能质检引擎、复核工作台</td></tr>
+<tr><td>质检尺度不一</td><td>打分表是笼统描述，没有拆到可判定的检查点</td><td>每个评分点写明检查对象、判定规则、证据来源、定性标准</td><td>评分点配置</td></tr>
+<tr><td>高风险件发现晚</td><td>分类靠经验，没有专项标记</td><td>接入即分类分级，高风险专项标记、优先派单</td><td>分类分级、风险预警</td></tr>
+<tr><td>经验在个人脑中</td><td>制度、案例没有结构化沉淀</td><td>按案件类型推送条款和相似案例，回答必须带出处</td><td>RAG 知识库助手</td></tr>
+<tr><td>整改闭环易断</td><td>跟踪靠 Excel，没人盯逾期</td><td>问题自动生成整改任务，逾期升级，整改后复检</td><td>整改闭环</td></tr>
+</tbody>
+</table>
+
+<hr />
+<h2 id="s3">3. 核心流程与产品架构</h2>
+<h3>3.1 设计原则</h3>
+<ol>
+<li><strong>人机协同，不承诺无人化</strong>：机器负责全量初筛、分类、评分与预警；定性裁量、客户沟通、最终结案保留人工确认；</li>
+<li><strong>合规优先于效率</strong>：模型输出必须可解释、可溯源、可审计，评分依据锚定条款原文，不接受“模型觉得”；</li>
+<li><strong>宁可多转人工，不可漏高风险</strong>：阈值先从保守开始，用复核数据逐步收紧；</li>
+<li><strong>小步验证</strong>：新评分点先影子运行（只评分、不生效），和人工结果比对达标后再启用。</li>
+</ol>
+
+<h3>3.2 核心流程（To-Be）</h3>
+<div class="flow" role="img" aria-label="核心流程图：接入分类、处置、结案自动质检、分流到人工复核或自动归档、整改闭环">
+  <div class="legend"><span><i style="border-color:var(--ai);background:var(--ai-soft)"></i>系统 / 模型自动完成</span><span><i style="border-color:var(--human);background:var(--human-soft)"></i>人工完成</span><span><i style="border-color:var(--fg);border-style:dashed"></i>分流判断</span></div>
+
+  <div class="stage">① 接入</div>
+  <div class="node">工单登记<small>来电 / 线上渠道 / 监管转办单</small></div>
+  <div class="arrow"></div>
+  <div class="node ai">自动分类分级 + 风险标记<small>业务类型 × 诉求类型 × 风险等级，涉征信 / 涉监管转办专项标记，给出置信度</small></div>
+  <div class="arrow"></div>
+  <div class="node dec">高风险，或分类置信度低？</div>
+  <div class="branch">
+    <div><span class="lbl">是</span><div class="node human">人工确认分类<small>进入优先队列，按专岗派单</small></div></div>
+    <div><span class="lbl">否</span><div class="node ai">按建议自动派单<small>处理岗可一键改类</small></div></div>
+  </div>
+
+  <div class="stage">② 处置</div>
+  <div class="node human">调查核实、拟方案、回复客户<small>知识库助手按案件类型推送适用条款与相似案例，全部带出处</small></div>
+  <div class="arrow"></div>
+  <div class="node">结案归档</div>
+
+  <div class="stage">③ 质检</div>
+  <div class="node ai">结案自动触发质检<small>规则评分点精确计算；语义评分点比对录音转写与工单，输出判定 + 证据片段 + 置信度</small></div>
+  <div class="arrow"></div>
+  <div class="node dec">是否触发转人工规则？<small style="font-weight:400">见 7.2，共 7 条</small></div>
+  <div class="branch">
+    <div><span class="lbl">是</span><div class="node human">质检员在复核工作台确认 / 改判<small>改判必须选原因，全量留痕</small></div></div>
+    <div><span class="lbl">否</span><div class="node ai">机器结论生效，自动归档<small>另随机抽 5%（示例）做质量抽查</small></div></div>
+  </div>
+  <div class="arrow"></div>
+
+  <div class="stage">④ 闭环</div>
+  <div class="node ai">问题件自动生成整改任务<small>派给责任团队，临期提醒、逾期升级</small></div>
+  <div class="arrow"></div>
+  <div class="node human">整改 → 复检 → 进入驾驶舱</div>
+  <div class="loop">↺ 改判记录与抽查结果回流：模型误判进校准样本，标准不清的评分点交主管修订</div>
+</div>
+
+<h3>3.3 产品架构</h3>
+<div class="arch">
+<div class="layer"><b>工作台（用户直接用的页面）</b><span>质检复核工作台<br>质检员</span><span>工单分类确认 + 处置助手<br>投诉处理岗</span><span>评分点配置<br>质检主管 / 合规岗</span><span>预警与驾驶舱<br>消保管理岗</span></div>
+<div class="layer"><b>能力层</b><span>分类分级模型<br>分类 / 分级 / 派单建议</span><span>质检引擎<br>规则评分 + 语义评分</span><span>RAG 知识库<br>法规 · 制度 · 案例</span><span>分流与预警规则<br>转人工 / 升级 / 聚集</span></div>
+<div class="layer"><b>数据层</b><span>工单数据</span><span>通话录音（ASR 转写）</span><span>历史案件库</span><span>法规制度库</span><span>质检与改判记录</span></div>
+<div class="layer"><b>基础层</b><span>私有化部署大模型</span><span>向量数据库</span><span>权限与审计日志</span><span>数据脱敏</span></div>
+</div>
+
+<hr />
+<h2 id="s4">4. 功能清单与优先级</h2>
+<h3>4.1 怎么排优先级</h3>
+<ul>
+<li><strong>P0 = 没有它闭环跑不通，或者漏了会出合规事故</strong>。MVP 只做一类高频投诉的“结案质检闭环”，再加接入时的高风险标记：高风险漏判的代价最大，必须第一版就有。</li>
+<li><strong>P1 = 提效明显、但缺了不影响闭环</strong>。知识库和整改任务依赖 P0 积累的数据（改判记录、问题清单），放第二版效果更好。</li>
+<li><strong>P2 = 管理层面的增强</strong>。数据量起来、评分点稳定之后再做才有意义。</li>
+</ul>
+<h3>4.2 功能清单</h3>
+<table>
+<thead><tr><th>模块</th><th>功能</th><th>用户</th><th>优先级</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td rowspan="3">智能质检</td><td>结案自动质检：规则评分点 + 语义评分点</td><td>质检员</td><td><span class="p p0">P0</span></td><td>语义评分必须带证据片段与录音时间点，无证据视为无效判断</td></tr>
+<tr><td>转人工分流（7 条规则）+ 复核工作台</td><td>质检员</td><td><span class="p p0">P0</span></td><td>确认 / 改判，改判必选原因；见 6.1 原型</td></tr>
+<tr><td>低风险自动归档件随机抽查</td><td>质检主管</td><td><span class="p p0">P0</span></td><td>唯一能发现机器“漏检”的口子，必须第一版就有</td></tr>
+<tr><td rowspan="2">评分点管理</td><td>评分点结构化配置（四要素 + 依据条款）</td><td>质检主管</td><td><span class="p p0">P0</span></td><td>见 6.3 原型</td></tr>
+<tr><td>影子运行 / 启用 / 回滚，版本留痕</td><td>质检主管</td><td><span class="p p0">P0</span></td><td>新评分点与人工双轨两周（示例），一致率达标后启用</td></tr>
+<tr><td rowspan="2">分类分级</td><td>高风险专项标记（涉征信异议、监管转办、媒体 / 诉讼）</td><td>处理岗</td><td><span class="p p0">P0</span></td><td>宁可误报不可漏报；命中即进人工确认</td></tr>
+<tr><td>全量自动分类 + 派单建议</td><td>处理岗</td><td><span class="p p1">P1</span></td><td>MVP 先做高风险识别，普通分类第二版铺开</td></tr>
+<tr><td>知识库助手</td><td>按案件类型推送条款、相似案例、核查清单</td><td>处理岗</td><td><span class="p p1">P1</span></td><td>回答强制带出处，查不到明确说“未检索到依据”</td></tr>
+<tr><td rowspan="2">整改闭环</td><td>问题件自动生成整改任务，逾期升级</td><td>一线 / 质检</td><td><span class="p p1">P1</span></td><td>替代 Excel 跟踪</td></tr>
+<tr><td>申诉通道</td><td>一线</td><td><span class="p p1">P1</span></td><td>由非原质检员复核；MVP 期间先走线下</td></tr>
+<tr><td rowspan="2">预警</td><td>时效预警：临近时限未结案分级提醒</td><td>处理岗 / 主管</td><td><span class="p p1">P1</span></td><td>纯规则，成本低</td></tr>
+<tr><td>聚集预警：同产品 / 渠道投诉短期异常上升</td><td>管理岗</td><td><span class="p p2">P2</span></td><td>需要足够历史数据定基线</td></tr>
+<tr><td rowspan="2">驾驶舱</td><td>质检覆盖、问题分布、整改完成率</td><td>管理岗</td><td><span class="p p1">P1</span></td><td>自动汇总，替代人工报表</td></tr>
+<tr><td>按机构 / 团队 / 产品下钻，团队质量排名</td><td>管理岗</td><td><span class="p p2">P2</span></td><td>排名灰度开启，配合申诉通道</td></tr>
+</tbody>
+</table>
+<h3>4.3 版本规划</h3>
+<table>
+<thead><tr><th>版本</th><th>范围</th><th>进入下一版的条件</th></tr></thead>
+<tbody>
+<tr><td><strong>MVP</strong></td><td>1 类高频投诉；结案质检闭环（P0 全部）；高风险标记</td><td>4 周影子运行，三项核心指标达标（见 7.1）</td></tr>
+<tr><td><strong>V1</strong></td><td>扩到全部投诉类型；全量分类派单、知识库助手、整改闭环、时效预警</td><td>试点团队 2 个月（示例）双轨运行，漏检率、改判率稳定</td></tr>
+<tr><td><strong>V2</strong></td><td>聚集预警、驾驶舱下钻、团队排名</td><td>评分点改判率持续低于观察线</td></tr>
+</tbody>
+</table>
+
+<hr />
+<h2 id="s5">5. 功能设计</h2>
+<h3>5.1 工单分类分级</h3>
+<ul>
+<li>按现行分类体系（业务类型 × 诉求类型 × 风险等级）打标；征信类诉求可按诉求性质继续细分；</li>
+<li>多诉点工单允许多标签，按最高风险诉点定级；</li>
+<li>涉征信异议、涉监管转办、涉媒体 / 诉讼 / 群体性风险的，专项标记并优先派单；</li>
+<li>每个分类结果带置信度，低置信度转人工确认，不硬分错派。</li>
+</ul>
+<h3>5.2 智能质检引擎（核心）</h3>
+<p>把质检标准从“打分表”变成“可执行的评分点”，每个评分点四要素齐全：<strong>检查对象、判定规则、证据来源、定性标准</strong>。示例（全表见附录 A）：</p>
+<table>
+<thead><tr><th>评分点</th><th>检查对象</th><th>判定方式</th><th>定性</th></tr></thead>
+<tbody>
+<tr><td>时效合规</td><td>工单时间戳 vs 监管 / 行内时限</td><td>规则引擎精确计算</td><td>超时即重大问题</td></tr>
+<tr><td>身份核验</td><td>录音转写文本</td><td>语义识别是否完成规定核验动作</td><td>缺失即合规问题</td></tr>
+<tr><td>法规告知完整性</td><td>回复话术 / 书面回复</td><td>与制度要求的话术要素逐项比对</td><td>要素缺失按项扣分</td></tr>
+<tr><td>处理结论与诉求匹配</td><td>工单结论 vs 客户诉求</td><td>语义判断，低置信度转人工</td><td>不匹配进入复核队列</td></tr>
+<tr><td>证据链完整性</td><td>归档材料清单</td><td>规则校验必备材料是否齐全</td><td>缺件自动退回补正</td></tr>
+</tbody>
+</table>
+<p><strong>设计要点</strong>：规则类评分点用规则引擎（结果确定、可复算），语义类评分点用大模型（给判断必须给证据片段）。两类结果在页面上分开显示，质检员可以逐项改判，改判全量留痕。这是评分体系能被一线接受、经得起申诉的前提。</p>
+<h3>5.3 RAG 知识库处置助手</h3>
+<ul>
+<li>知识范围：消保相关法规与监管文件、行内投诉处理制度与话术规范、脱敏后的历史复杂案件；</li>
+<li>回答强制带引用：每条建议标注来源文件与条款，查不到就回答“未检索到依据”，不编造；</li>
+<li>按案件类型预置核查清单（如征信异议类案件需要核查哪些记录、各查什么），新人按清单执行即可达到合规底线；</li>
+<li>知识库按版本管理：法规更新后旧条款标记失效，引用到失效条款的回答会提示。</li>
+</ul>
+<h3>5.4 风险预警</h3>
+<ul>
+<li><strong>升级预警</strong>：客户明确提到监管投诉、媒体曝光、法律途径等，实时标记；</li>
+<li><strong>时效预警</strong>：临近处理时限未结案的工单分级提醒，避免“忘了”造成合规事故；</li>
+<li><strong>聚集预警</strong>（V2）：同一产品、渠道、合作机构的投诉量短期异常上升，自动生成简报。</li>
+</ul>
+<h3>5.5 管理驾驶舱</h3>
+<p>质检覆盖率、问题类型分布、团队与个人质量趋势、整改完成率、投诉分类分布，全部由质检结果自动生成，替代人工 Excel 汇总；V2 支持按机构、团队、产品、渠道下钻。</p>
+
+<hr />
+<h2 id="s6">6. 关键页面原型</h2>
+<p class="desc">低保真线框，展示信息结构和关键交互；页面中的工单、对话、条款名均为虚构示例。</p>
+
+<h3>6.1 质检复核工作台（质检员，P0）</h3>
+<div class="wf" role="img" aria-label="质检复核工作台线框图">
+  <div class="wf-bar">质检复核工作台<span>待复核 23 · 今日已完成 41</span></div>
+  <div class="wf-body wf-3">
+    <div class="wf-col">
+      <div class="wf-h"><span class="num">1</span>复核队列 · 按风险排序</div>
+      <div class="q on"><b>TS-0412 · 征信异议</b><span class="chip hot">涉征信</span><span class="chip hot">重大评分点</span></div>
+      <div class="q"><b>TS-0397 · 分期费用</b><span class="chip">低置信度 0.61</span></div>
+      <div class="q"><b>TS-0388 · 催收方式</b><span class="chip">规则语义冲突</span></div>
+      <div class="q"><b>TS-0371 · 年费争议</b><span class="chip ok">随机抽查</span></div>
+      <div class="q"><b>TS-0365 · 额度调整</b><span class="chip">一线申诉</span></div>
+    </div>
+    <div class="wf-col">
+      <div class="wf-h"><span class="num">2</span>工单与录音转写</div>
+      <p class="line"><b>诉求</b>：客户称未逾期却被报送不良记录，要求更正。</p>
+      <p class="line"><b>结论</b>：已核实报送无误，向客户解释。</p>
+      <p class="line"><span class="ts">00:42</span>客服：您好，请问是王先生本人吗？</p>
+      <p class="line"><span class="ts">00:45</span>客户：是我。</p>
+      <p class="line"><span class="ts">00:47</span>客服：<mark>那我直接跟您说一下处理结果……</mark></p>
+      <p class="line"><span class="ts">03:10</span>客户：那我要是还不认可呢？</p>
+      <p class="line"><span class="ts">03:14</span>客服：<mark>这个已经是最终结果了。</mark></p>
+    </div>
+    <div class="wf-col">
+      <div class="wf-h"><span class="num">3</span>评分点 · 机器判定</div>
+      <div class="sp"><div class="r"><b>时效合规</b><span class="chip ok">通过</span></div><div class="src">规则 · 结案用时在时限内</div></div>
+      <div class="sp flag"><div class="r"><b>身份核验</b><span class="chip hot">问题 · 0.88</span></div><div class="src">语义 · 证据 00:42–00:47：仅确认姓名，未完成规定核验动作</div><div class="src">依据：《投诉处理规范》第 X 条（示例）</div><div class="btns"><span class="b">确认</span><span class="b">改判</span></div></div>
+      <div class="sp flag"><div class="r"><b>异议渠道告知</b><span class="chip hot">疑似 · 0.72</span></div><div class="src">语义 · 证据 03:10–03:14：未告知客户进一步异议途径</div><div class="btns"><span class="b">确认</span><span class="b">改判</span></div></div>
+    </div>
+  </div>
+  <div class="wf-foot"><span><span class="num">4</span>改判原因（必选）：模型误判 / 评分点标准不清 / 证据不足 / 特殊情形</span><span class="b pri">提交复核结论</span></div>
+</div>
+<ol class="notes">
+<li><strong>队列</strong>：每张卡片写明“为什么转人工”，对应 7.2 的触发规则；高风险排在最前。</li>
+<li><strong>证据联动</strong>：点右侧评分点，中间自动定位到对应录音片段并高亮；质检员不用从头听录音。</li>
+<li><strong>规则与语义分开</strong>：规则类只显示计算结果；语义类显示置信度、证据片段、依据条款，可逐项确认或改判。</li>
+<li><strong>改判必选原因</strong>：原因决定数据流向：模型误判进校准样本，标准不清推给主管修订评分点。</li>
+</ol>
+
+<h3>6.2 工单分类确认（投诉处理岗，P0 / P1）</h3>
+<div class="wf" role="img" aria-label="工单分类确认线框图">
+  <div class="wf-bar">新工单 TS-0430<span>来源：监管转办 · 登记于 09:12</span></div>
+  <div class="wf-body wf-2">
+    <div class="wf-col">
+      <div class="wf-h">工单摘要</div>
+      <p class="line">客户对个人征信记录提出异议，要求核实更正；同时质疑分期手续费计算方式。</p>
+      <div class="wf-h" style="margin-top:10px">系统识别的诉点</div>
+      <p class="line">① 征信异议类 <span class="chip hot">高风险</span>　② 分期费用类 <span class="chip">一般</span></p>
+      <div class="wf-h" style="margin-top:10px">知识库推送（P1）</div>
+      <p class="line">征信异议类核查清单 · 相关条款 2 条 · 相似案例 3 件，均带出处</p>
+    </div>
+    <div class="wf-col">
+      <div class="wf-h">分类结果</div>
+      <p class="line">风险等级：<b>高</b>（按最高风险诉点）</p>
+      <p class="line"><span class="chip hot">涉征信</span><span class="chip hot">监管转办</span></p>
+      <p class="line">置信度：<b>0.93</b></p>
+      <p class="line">派单建议：征信投诉专岗</p>
+      <p class="line desc">命中高风险标签，需人工确认后派单</p>
+      <div class="btns"><span class="b pri">确认并派单</span><span class="b">修改分类</span></div>
+    </div>
+  </div>
+</div>
+<ol class="notes">
+<li>多诉点工单拆成多个标签，按最高风险诉点定级。征信类投诉最难的就是诉点多且细，拆开显示能避免漏处理其中一个。</li>
+<li>高风险件即使置信度高也要人工确认；“修改分类”的记录用于评估分类准确率。</li>
+</ol>
+
+<h3>6.3 评分点配置（质检主管，P0）</h3>
+<div class="wf" role="img" aria-label="评分点配置线框图">
+  <div class="wf-bar">评分点管理<span class="b pri" style="color:#fff">＋ 新建评分点</span></div>
+  <div class="wf-body wf-2">
+    <div class="wf-col">
+      <table>
+        <thead><tr><th>评分点</th><th>类型</th><th>状态</th><th>影子期一致率</th><th>近 30 天改判率</th></tr></thead>
+        <tbody>
+          <tr><td>时效合规</td><td>规则</td><td><span class="chip ok">已启用</span></td><td>—</td><td>0.4%</td></tr>
+          <tr><td>身份核验</td><td>语义</td><td><span class="chip ok">已启用</span></td><td>91%</td><td>6.2%</td></tr>
+          <tr><td>异议渠道告知</td><td>语义</td><td><span class="chip ai">影子运行 第 9 天</span></td><td>83%</td><td>—</td></tr>
+          <tr><td>承诺性表述</td><td>语义</td><td><span class="chip">草稿</span></td><td>—</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="wf-col">
+      <div class="wf-h">编辑：异议渠道告知</div>
+      检查对象<div class="field">录音转写 · 书面回复</div>
+      判定规则<div class="field">客户表示不认可结果时，是否告知进一步异议途径</div>
+      证据来源<div class="field">转写片段 + 时间戳（必填）</div>
+      定性标准<div class="field">一般问题</div>
+      依据条款<div class="field">《投诉处理规范》第 X 条（示例）</div>
+      <div class="btns"><span class="b">保存草稿</span><span class="b pri">进入影子运行</span></div>
+    </div>
+  </div>
+</div>
+<ol class="notes">
+<li>评分点状态：草稿 → 影子运行（只评分，不生效）→ 已启用；任意版本可一键回滚。</li>
+<li>“近 30 天改判率”是评分点的健康度：某个评分点改判率持续偏高，说明标准写得不清或模型判不准，主管优先处理这一条。</li>
+</ol>
+
+<hr />
+<h2 id="s7">7. 评测指标与人工复核机制</h2>
+<h3>7.1 评测指标</h3>
+<table>
+<thead><tr><th>指标</th><th>口径</th><th>示例门槛</th><th>在哪测、多久看</th></tr></thead>
+<tbody>
+<tr><td><strong>分类准确率</strong></td><td>自动分类与人工金标准一致的工单数 ÷ 测试集工单数；业务类型和诉求类型两级都对才算对</td><td>≥ 90%</td><td>上线前历史标注集回测；上线后月度抽检 + 处理岗改类记录</td></tr>
+<tr><td><strong>高风险召回率</strong></td><td>被正确标为高风险的工单数 ÷ 金标准中全部高风险工单数</td><td>≥ 95%</td><td>专项测试集；宁可误报不可漏报</td></tr>
+<tr><td>高风险精确率</td><td>真正高风险的工单数 ÷ 被标为高风险的工单数</td><td>观察线，不设硬门槛</td><td>太低说明高风险队列被误报淹没，人工确认负担过重</td></tr>
+<tr><td><strong>质检一致性</strong></td><td>机器与资深质检员结论一致的评分点数 ÷ 双盲比对的评分点总数</td><td>≥ 85%</td><td>影子运行期双盲比对，分歧由专家仲裁</td></tr>
+<tr><td><strong>漏检率</strong></td><td>人工抽查发现、机器未报的问题数 ÷ 人工确认的问题总数</td><td>≤ 10%</td><td>来自低风险自动归档件的随机抽查，周度看</td></tr>
+<tr><td>改判率</td><td>质检员改判的机器结论数 ÷ 进入复核的机器结论数，按评分点拆开看</td><td>观察线</td><td>周度；单个评分点持续偏高就退回影子运行</td></tr>
+<tr><td>转人工率</td><td>进入人工复核队列的工单数 ÷ 结案工单数</td><td>15%–25%（示例）</td><td>日度；要和质检人力匹配</td></tr>
+<tr><td>引用准确率</td><td>知识库回答中引用条款真实且适用的比例</td><td>≥ 95%</td><td>月度抽样人工核验</td></tr>
+</tbody>
+</table>
+<p><strong>取舍</strong>：高风险召回率和转人工率是一对矛盾。阈值调低，召回升高，转人工率也跟着升高，复核人力扛不住。上线初期先保召回，接受较高的转人工率；再用改判数据看哪些转人工是“白转”，逐步收紧阈值。</p>
+
+<h3>7.2 哪些情况必须转人工</h3>
+<table>
+<thead><tr><th>#</th><th>触发条件</th><th>例子</th><th>为什么</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>命中高风险标签，不论置信度</td><td>涉征信异议、监管转办、媒体 / 诉讼 / 群体性</td><td>漏判代价最大，必须人看</td></tr>
+<tr><td>2</td><td>任一<strong>重大</strong>评分点判为问题或疑似</td><td>时效超时、身份核验缺失、结论与诉求不匹配</td><td>重大问题会进通报和整改，定性必须由人做</td></tr>
+<tr><td>3</td><td>置信度低于阈值</td><td>分类或语义评分低于 0.8（示例）</td><td>模型自己都拿不准</td></tr>
+<tr><td>4</td><td>规则结果与语义结果冲突，或给不出证据片段</td><td>规则判通过、语义判有问题；判了问题但定位不到原话</td><td>没有证据的判断视为无效</td></tr>
+<tr><td>5</td><td>一线申诉</td><td>被质检人不认可结果</td><td>由非原质检员复核，保证公平</td></tr>
+<tr><td>6</td><td>自动归档件随机抽查</td><td>低风险自动归档件抽 5%（示例）</td><td>唯一能量出漏检率的口子，防止机器盲区</td></tr>
+<tr><td>7</td><td>评分点处于影子运行期</td><td>新上线或刚修订的评分点</td><td>只评分不生效，与人工双轨比对</td></tr>
+</tbody>
+</table>
+
+<h3>7.3 复核结论怎么回流</h3>
+<table>
+<thead><tr><th>改判原因</th><th>流向</th><th>谁处理</th></tr></thead>
+<tbody>
+<tr><td>模型误判</td><td>进入校准样本集，定期重新评测</td><td>模型 / 算法</td></tr>
+<tr><td>评分点标准不清</td><td>该评分点进入修订待办，必要时退回影子运行</td><td>质检主管</td></tr>
+<tr><td>证据不足（转写错误、录音缺失）</td><td>记为数据问题，按渠道统计</td><td>数据 / 系统</td></tr>
+<tr><td>特殊情形</td><td>沉淀为判例，进入知识库</td><td>质检主管</td></tr>
+</tbody>
+</table>
+<p>这和人工质检时“先归因再解决”是一个思路：同样是判错，是模型问题、标准问题还是数据问题，处理办法完全不同。</p>
+
+<h3>7.4 防幻觉设计</h3>
+<ol>
+<li><strong>引用溯源强制开启</strong>：知识问答和质检判定中，每条法规类结论必须挂原文出处，无出处不输出；</li>
+<li><strong>置信度分流</strong>：低置信度结果不自动生效，界面明示“需人工确认”；</li>
+<li><strong>人审兜底</strong>：重大问题定性、客户最终回复、结案结论三类动作，系统只给建议；</li>
+<li><strong>灰度与回滚</strong>：新评分点先影子运行，异常可一键回滚到上一版本。</li>
+</ol>
+
+<hr />
+<h2 id="s8">8. 上线验证与迭代</h2>
+<h3>8.1 MVP 验证计划（4 周）</h3>
+<table>
+<thead><tr><th>周次</th><th>工作内容</th><th>产出</th></tr></thead>
+<tbody>
+<tr><td>第 1 周</td><td>选定 1 类高频投诉，梳理现行打分表，拆成评分点</td><td>MVP 范围说明、评分点 v1</td></tr>
+<tr><td>第 2 周</td><td>标注金标准集（历史案件 500–1,000 件，示例）</td><td>金标准集、标注规范</td></tr>
+<tr><td>第 3 周</td><td>离线回测、调阈值，对照 7.1 门槛</td><td>回测报告</td></tr>
+<tr><td>第 4 周</td><td>影子运行，与人工质检双盲比对</td><td>验证结论：扩大 / 调整 / 停止</td></tr>
+</tbody>
+</table>
+<p>任一核心指标（分类准确率、高风险召回率、质检一致性）不达标，不进入 V1。</p>
+<h3>8.2 上线后看什么</h3>
+<table>
+<thead><tr><th>维度</th><th>指标</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>北极星</td><td>重大合规问题在结案后 1 天内被发现的比例</td><td>产品存在的意义：问题从“抽到才知道”变成“结案就知道”</td></tr>
+<tr><td>质量</td><td>漏检率、改判率、高风险召回率</td><td>见 7.1</td></tr>
+<tr><td>效率</td><td>质检员人均日复核量、单件复核时长</td><td>示例：重复打分工作量减少 40%–60%，人力转到高风险复核和评分点运营</td></tr>
+<tr><td>采纳</td><td>质检员确认率、一线申诉率</td><td>申诉率持续偏高，说明评分点没被一线接受</td></tr>
+</tbody>
+</table>
+<p class="desc">效率数字为示例参数，实际以试点实测为准，不做点值承诺。</p>
+<h3>8.3 试点与推广</h3>
+<ul>
+<li><strong>试点（2 个月，示例）</strong>：1 个处理团队全量使用，系统与人工双轨，逐周复盘分歧案件、迭代评分点；</li>
+<li><strong>推广</strong>：分批扩展到全部团队与投诉类型，同步上线知识库助手与整改闭环；</li>
+<li><strong>运营</strong>：评分点与知识库按月更新（法规变化、新型投诉），指标月度评估；质检员角色转向“高风险复核 + 评分点运营”。</li>
+</ul>
+
+<hr />
+<h2 id="s9">9. 数据安全与风险</h2>
+<h3>9.1 数据安全</h3>
+<ul>
+<li><strong>私有化部署</strong>：模型、向量库和业务数据部署在行内环境，数据不出域；</li>
+<li><strong>脱敏</strong>：客户姓名、证件号、卡号等进入模型前自动脱敏，按权限还原；</li>
+<li><strong>权限分级</strong>：按岗位设定可见范围，与行内现有权限体系对齐；</li>
+<li><strong>审计日志</strong>：谁在什么时间查了什么、改了什么评分，全量留痕。</li>
+</ul>
+<h3>9.2 风险与应对</h3>
+<table>
+<thead><tr><th>风险</th><th>表现</th><th>应对</th></tr></thead>
+<tbody>
+<tr><td>评分点与一线实际脱节</td><td>机器评分被大量申诉、改判</td><td>质检专家共建评分点 + 影子运行；按评分点看改判率，月度修订</td></tr>
+<tr><td>模型语义误判</td><td>话术类评分点误报多</td><td>语义类评分点只标“疑似”，人工确认后才生效</td></tr>
+<tr><td>法规更新滞后</td><td>新规出台后仍引用旧条款</td><td>知识库版本管理 + 专人维护，失效条款自动提示</td></tr>
+<tr><td>一线抵触</td><td>认为智能质检是“找茬工具”</td><td>先用于辅导和风险拦截；排名通报放 V2 灰度开启，配申诉通道</td></tr>
+<tr><td>复核人力被挤爆</td><td>转人工率过高，队列积压</td><td>上线初期按人力设转人工上限；用改判数据识别“白转”，收紧阈值</td></tr>
+<tr><td>指标口径争议</td><td>各方对“准确率”理解不一</td><td>指标定义、测试集、计算方式在验证计划中逐项写死</td></tr>
+</tbody>
+</table>
+
+<hr />
+<h2 id="appendix-a">附录 A：评分点体系（示例节选）</h2>
+<table>
+<thead><tr><th>类别</th><th>评分点</th><th>类型</th><th>定性等级</th></tr></thead>
+<tbody>
+<tr><td>时效</td><td>受理、处理、回复各环节是否超时</td><td>规则</td><td>重大</td></tr>
+<tr><td>程序</td><td>身份核验动作是否完成</td><td>语义</td><td>重大</td></tr>
+<tr><td>程序</td><td>是否按规定完成录音告知</td><td>语义</td><td>一般</td></tr>
+<tr><td>实体</td><td>处理结论与客户诉求是否匹配</td><td>语义 + 人工</td><td>重大</td></tr>
+<tr><td>实体</td><td>法规 / 制度依据引用是否正确</td><td>语义（带引用核验）</td><td>重大</td></tr>
+<tr><td>话术</td><td>是否使用禁用语、承诺性表述</td><td>语义</td><td>一般—重大</td></tr>
+<tr><td>话术</td><td>客户不认可时是否告知进一步异议途径</td><td>语义</td><td>一般</td></tr>
+<tr><td>证据</td><td>归档材料是否齐全、留痕是否完整</td><td>规则</td><td>一般</td></tr>
+<tr><td>服务</td><td>沟通态度（情绪化、推诿表述识别）</td><td>语义</td><td>提示</td></tr>
+</tbody>
+</table>
+
+<h2 id="appendix-b">附录 B：几个产品取舍</h2>
+<ul>
+<li><strong>为什么不让机器直接出最终结论？</strong>质检结果会进通报、影响一线考核，一旦误判，伤的是整个体系的公信力。所以重大问题必须人定性，机器的价值是把人的注意力集中到该看的地方。</li>
+<li><strong>为什么 MVP 不做全量分类，却要做高风险标记？</strong>普通分类分错了，处理岗改一下就行；高风险漏掉了，可能就是监管转办。先做代价最大的那一块。</li>
+<li><strong>为什么要随机抽查“机器判没问题”的件？</strong>只复核机器报出来的问题，永远量不出机器漏了什么。抽查是漏检率唯一的数据来源。</li>
+<li><strong>为什么改判必须选原因？</strong>不选原因，改判数据只能说明“机器错了”，说明不了该改模型、改标准还是修数据。</li>
+</ul>
+
+<hr />
+<p style="font-size:13px;color:var(--muted)">作品性质：产品方案作品，方案结构、评分点体系与页面原型由作者基于行业通用做法独立设计；文中业务量级、比例、阈值与页面内容均为虚构示例。作者：Reyne · 求职方向：风控产品 / 智能风控 / 风控策略。</p>
+</body>
+</html>
